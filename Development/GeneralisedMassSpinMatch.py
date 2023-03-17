@@ -1,11 +1,29 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2023 Susanna M. Green, Andrew Lundgren, and Xan Morice-Atkinson 
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at your
+# option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 import os
 import numpy as np
 import pandas as pd
 import time
-import matplotlib.pyplot as plt
+import argparse
 import logging
+import matplotlib.pyplot as plt
 
-from sklearn import preprocessing
 from sklearn import model_selection
 
 from scipy.stats import gaussian_kde
@@ -15,9 +33,18 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
-import matplotlib.pyplot as plt # for plotting
-
 from torch.utils.tensorboard import SummaryWriter
+
+# Read command line option
+parser = argparse.ArgumentParser(description=__doc__)
+
+# Begin with code specific options
+parser.add_argument("--neural-network-output-file", action="store", default=True,
+                    help="Save the trained neural network model.")
+parser.add_argument("-B", "--data", action="store", required=True,
+                    help="The data required for the neural networkto be trained." 
+                    "This will be split into training, validtaion and test datasets")
+
 writer = SummaryWriter()
 layout = {
     "ABCDE": {
@@ -44,40 +71,36 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
 
 #Upload the data
+logging.info("Reading in the data")
 TemplateBank = pd.read_csv(r'Unsorted1000000MassSpinTemplateBank.csv')
 
 #Split the data
+logging.info("Splitting the data into training, validtaion and test datasets")
 TrainingBank, TestValidationBank = model_selection.train_test_split(TemplateBank, test_size=0.1)
 TestBank, ValidationBank = model_selection.train_test_split(TestValidationBank, test_size=0.5)
-print(f'The data size of the training, validation and test dataset is {len(TrainingBank), len(ValidationBank), len(TestBank)}, respectively')
+logging.info(f'The data size of the training, validation and test dataset is {len(TrainingBank), len(ValidationBank), len(TestBank)}, respectively')
 
-#Using Standard.scalar() to re-scale the Training Bank and applying to the validation and test bank. 
-scaler = preprocessing.StandardScaler()
-TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']] = scaler.fit_transform(TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']])
-ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']] = scaler.transform(ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']])
-TestBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']] = scaler.transform(TestBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2']])
-
-#Splitting into input (i.e. the template parameters) and output (the match)
-x_train = np.vstack((TrainingBank.ref_mass1.values, TrainingBank.ref_mass2.values, 
-TrainingBank.mass1.values, TrainingBank.mass2.values,
+#Scaling the mass values and splitting into input (i.e. the template parameters) and output (the match)
+logging.info("Scaling the mass values and splitting into input (i.e. the template parameters) and output (the match)")
+x_train = np.vstack((scaling_the_mass(TrainingBank.ref_mass1.values), scaling_the_mass(TrainingBank.ref_mass2.values), 
+scaling_the_mass(TrainingBank.mass1.values), scaling_the_mass(TrainingBank.mass2.values),
 TrainingBank.ref_spin1.values, TrainingBank.ref_spin2.values,
 TrainingBank.spin1.values, TrainingBank.spin2.values)).T
 y_train = TrainingBank.match.values
 
-x_val = np.vstack((ValidationBank.ref_mass1.values, ValidationBank.ref_mass2.values, 
-ValidationBank.mass1.values, ValidationBank.mass2.values,
+x_val = np.vstack((scaling_the_mass(ValidationBank.ref_mass1.values), scaling_the_mass(ValidationBank.ref_mass2.values), 
+scaling_the_mass(ValidationBank.mass1.values), scaling_the_mass(ValidationBank.mass2.values),
 ValidationBank.ref_spin1.values, ValidationBank.ref_spin2.values,
 ValidationBank.spin1.values, ValidationBank.spin2.values)).T
 y_val = ValidationBank.match.values
 
-x_test = np.vstack((TestBank.ref_mass1.values, TestBank.ref_mass2.values, 
-TestBank.mass1.values, TestBank.mass2.values,
+x_test = np.vstack((scaling_the_mass(TestBank.ref_mass1.values), scaling_the_mass(TestBank.ref_mass2.values), 
+scaling_the_mass(TestBank.mass1.values), scaling_the_mass(TestBank.mass2.values),
 TestBank.ref_spin1.values, TestBank.ref_spin2.values,
 TestBank.spin1.values, TestBank.spin2.values)).T
 y_test = TestBank.match.values
-x_real = scaler.inverse_transform(x_test)
-y_real = np.arccos(y_test)
 
+logging.info("COnverting to datasets to a trainloader")
 #Convert a numpy array to a Tensor
 x_train = torch.tensor(x_train, dtype=torch.float32, device='cuda')
 y_train = torch.tensor(y_train, dtype=torch.float32, device='cuda')
@@ -90,6 +113,9 @@ y_test = torch.tensor(y_test, dtype=torch.float32, device='cuda')
 xy_train = TensorDataset(x_train, y_train)
 xy_val = TensorDataset(x_val, y_val)
 xy_test = TensorDataset(x_test, y_test)
+
+training_loader  = DataLoader(xy_train, batch_size=batch_size, shuffle=True, drop_last=True)
+validation_loader = DataLoader(xy_val, batch_size=batch_size, drop_last=True)
 
 class NeuralNetwork(torch.nn.Module):
     def __init__(self):
@@ -108,7 +134,6 @@ class NeuralNetwork(torch.nn.Module):
         x = self.linear_out(x)
         return x
 
-# RUN ITTTT
 start_time = time.time()
 loss_list = []
 val_list = []
@@ -116,8 +141,6 @@ val_list = []
 epoch_number = 0
 EPOCHS = 200
 batch_size = 64
-training_loader  = DataLoader(xy_train, batch_size=batch_size, shuffle=True, drop_last=True)
-validation_loader = DataLoader(xy_val, batch_size=batch_size, drop_last=True)
 
 our_model = NeuralNetwork().to(device)
 criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
@@ -186,6 +209,9 @@ for epoch in range(EPOCHS):
     del vepoch_loss
     del inputs
     del vinputs
+
+    #if epoch%10==0: 
+    #    torch.cuda.memory_summary(device=None, abbreviated=False)
     
     #This step to is determine whether the scheduler needs to be used 
     scheduler.step(vepoch_mse)
@@ -206,8 +232,8 @@ print("Time taken", time.time() - start_time)
 writer.flush()
 writer.close()
 
-scheduler.optimizer.param_groups[0]['lr']
-optimizer.state
+#scheduler.optimizer.param_groups[0]['lr']
+#optimizer.state
 
 our_model.train(False)
 #Time taken to predict the match on the test dataset  
@@ -232,42 +258,49 @@ for x, y in zip(error, x_real):
         pass
 
 #Save the Neural Network 
-torch.save(our_model.state_dict(), '/users/sgreen/GPU/Width/1000000_mass_spin_model.pth')
+torch.save(our_model.state_dict(), '/users/sgreen/GPU/Width/saved_model_158.pth')
 
 #A really complicated way of getting the list off the GPU and into a numpy array
 loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
 val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
 
-np.savetxt("1000000_mass_spin_training.csv", loss_array, delimiter=",")
-np.savetxt("1000000_mass_spin_validation.csv", val_loss_array, delimiter=",")
-
 #Plots the loss curve for training and validation data set
-plt.figure(figsize=(8.2, 6.2))
-plt.semilogy(np.arange(1, len(loss_array)+1), loss_array, color='#5B2C6F', label='Training Loss')
-plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF', label='Validation Loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.savefig('1000000_mass_spin_loss_curve_plot.pdf')
+plt.figure()
+plt.semilogy(np.arange(1, len(loss_array)+1), loss_array, color='#5B2C6F')
+plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF')
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.savefig('norm_loss_curve_158.pdf')
 
 #Creates plots to compare the actual and predicted matches 
-plt.figure(figsize=(8, 6))
+plt.figure()
+
 x = to_cpu_np(y_test)
 y = to_cpu_np(y_prediction[:, 0])
-plt.scatter(x,y, s=2, color='#0096FF')
-plt.axline((0, 0), slope=1, color='k')
-plt.xlabel('Actual Match')
-plt.ylabel('Predicted Match')
-plt.savefig('1000000_mass_spin_actual_predicted_plot.pdf', dpi=300)
+# Calculate the point density
+xy = np.vstack([x,y])
+z = gaussian_kde(xy)(xy)
 
-#Creates plots to compare the errors
-plt.figure(figsize=(12, 10))
-plt.hist(error, bins=50, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
-plt.hist(error[x > .95], bins=50, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
-plt.xlim([error.min(), error.max()])
-plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
-plt.yscale('log')
+# Sort the points by density, so that the densest points are plotted last
+idx = z.argsort()
+x, y, z = x[idx], y[idx], z[idx]
+
+plt.scatter(x,y,c=z, s=20) #, color='#5B2C6F')
+
+plt.xlabel('Actual match')
+plt.ylabel('Predicted match')
+plt.savefig('norm_actual_predicted_158.pdf', dpi=300)
+
+#Plots the distribution of errors for the test data
+plt.figure()
+plt.hist(error, bins=50, color='#5B2C6F')
 plt.xlabel('Error')
 plt.ylabel('Count')
-plt.legend(loc='upper left')
-plt.savefig('1000000_mass_spin_error_plot.pdf', dpi=300)
+plt.savefig('norm_error_158.pdf', dpi=300)
+
+#Plots the distribution of errors for the test data where the actual match > .95
+plt.figure()
+plt.hist(error[x > .95], bins=50, color='#5B2C6F')
+plt.xlabel('Error')
+plt.ylabel('Count')
+plt.savefig('norm_error_clipped_158.pdf', dpi=300)
