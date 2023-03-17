@@ -8,13 +8,36 @@ import logging
 from sklearn import preprocessing
 from sklearn import model_selection
 
+from scipy.stats import gaussian_kde
+
 import torch
 import torch.nn as nn
-from torch.optim.lr_scheduler import MultiStepLR
+from torch.utils.data import DataLoader, TensorDataset
+from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
+
+import matplotlib.pyplot as plt # for plotting
+
+from torch.utils.tensorboard import SummaryWriter
+writer = SummaryWriter()
+layout = {
+    "ABCDE": {
+        "loss": ["Multiline", ["loss/train", "loss/validation"]],
+        "accuracy": ["Multiline", ["accuracy/train", "accuracy/validation"]],
+    },
+}
+writer.add_custom_scalars(layout)
 
 #Defining functions
 def to_cpu_np(x):
     return x.cpu().detach().numpy()
+
+def scaling_the_mass(mass):
+    scaled_mass = (mass - 51)/ np.sqrt(799)
+    return scaled_mass
+
+def rescaling_the_mass(mass):
+    rescaled_mass = mass* np.sqrt(799) + 51
+    return rescaled_mass
 
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -55,6 +78,11 @@ x_val = torch.tensor(x_val, dtype=torch.float32, device='cuda')
 y_val = torch.tensor(y_val, dtype=torch.float32, device='cuda')
 x_test = torch.tensor(x_test, dtype=torch.float32, device='cuda')
 y_test = torch.tensor(y_test, dtype=torch.float32, device='cuda')
+
+#Convert data into trainloader
+xy_train = TensorDataset(x_train, y_train)
+xy_val = TensorDataset(x_val, y_val)
+xy_test = TensorDataset(x_test, y_test)
 
 class NeuralNetwork(torch.nn.Module):
     def __init__(self):
