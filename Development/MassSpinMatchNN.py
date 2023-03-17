@@ -15,7 +15,11 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
-import matplotlib.pyplot as plt # for plotting
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.rcParams.update({'font.size': 20})
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()

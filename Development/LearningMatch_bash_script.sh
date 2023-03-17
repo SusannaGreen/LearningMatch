@@ -20,5 +20,6 @@ source activate /users/sgreen/.conda/envs/PyCBCandPytorch2
 echo `conda info`
 echo `which python`
 
-cd /users/sgreen/LearningMatch/Development
+cd /users/sgreen/Lear
+ningMatch/Development
 python NewMassMatchNN.py

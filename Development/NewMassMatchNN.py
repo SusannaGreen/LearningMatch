@@ -15,7 +15,11 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
-import matplotlib.pyplot as plt # for plotting
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.rcParams.update({'font.size': 20})
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
@@ -239,7 +243,7 @@ plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig('100000_mass_loss_curve_plot.pdf')
+plt.savefig('100000_mass_loss_curve_plot2.pdf')
 
 #Creates plots to compare the actual and predicted matches 
 plt.figure(figsize=(8, 6))
@@ -249,16 +253,16 @@ plt.scatter(x,y, s=2, color='#0096FF')
 plt.axline((0, 0), slope=1, color='k')
 plt.xlabel('Actual Match')
 plt.ylabel('Predicted Match')
-plt.savefig('100000_mass_actual_predicted_plot.pdf', dpi=300)
+plt.savefig('100000_mass_actual_predicted_plot2.pdf', dpi=300)
 
 #Creates plots to compare the errors
 plt.figure(figsize=(12, 10))
 plt.hist(error, bins=50, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
 plt.hist(error[x > .95], bins=50, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
 plt.xlim([error.min(), error.max()])
-plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
+plt.xticks([-0.05, -0.03, -0.01, 0, 0.01, 0.03, 0.05])
 plt.yscale('log')
 plt.xlabel('Error')
 plt.ylabel('Count')
 plt.legend(loc='upper left')
-plt.savefig('100000_mass_error_plot.pdf', dpi=300)
+plt.savefig('100000_mass_error_plot2.pdf', dpi=300)
