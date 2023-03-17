@@ -24,7 +24,7 @@ print(f"Using {device} device")
 TemplateBank = pd.read_csv(r'100000MassTrainingBank.csv')
 
 #Split the data
-TrainingBank, TestValidationBank = model_selection.train_test_split(TemplateBank, test_size=0.1)
+TrainingBank, TestValidationBank = model_selection.train_test_split(TemplateBank, test_size=0.01)
 TestBank, ValidationBank = model_selection.train_test_split(TestValidationBank, test_size=0.5)
 print(f'The data size of the training, validation and test dataset is {len(TrainingBank), len(ValidationBank), len(TestBank)}, respectively')
 
@@ -67,55 +67,112 @@ class NeuralNetwork(torch.nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = torch.nn.functional.relu(self.linear0(x))
         x = torch.nn.functional.relu(self.linear1(x))
-        x = torch.nn.functional.relu(self.linear2(x))
+        x = torch.sigmoid(self.linear2(x))
         x = self.linear_out(x)
         return x
 
-our_model = NeuralNetwork().to(device)
-criterion = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(our_model.parameters(), lr = 0.001)
-scheduler = MultiStepLR(optimizer, milestones=[100], gamma=0.2) #gamma relative to lr = 0.001
-
+# RUN ITTTT
 start_time = time.time()
 loss_list = []
 val_list = []
-for epoch in range(20000): #10000 and 0.001
-    #Compute the validation loss
-    test_pred_y = our_model(x_test)
-    val_loss = criterion(test_pred_y[:, 0], y_test)
-    
-    # Forward pass: Compute predicted y by passing x to the model
-    pred_y = our_model(x_train)
-    # Compute and print loss
-    loss = criterion(pred_y[:, 0], y_train)
-    
-    # Zero gradients, perform a backward pass, and update the weights.
-    optimizer.zero_grad()
-    loss.backward()
-    optimizer.step()
-    
-    #This step to is determine whether the scheduler needs to be used
-    scheduler.step()
-    
-    #Create a loss_curve
-    loss_list.append(loss.item())
-    val_list.append(val_loss.item())
 
-    #View performance during training
-    if epoch%1000==0:
-        print('epoch {}, training loss {}, validation loss {}'.format(epoch, loss.item(), val_loss.item())) 
+epoch_number = 0
+EPOCHS = 200
+batch_size = 16
+training_loader  = DataLoader(xy_train, batch_size=batch_size, shuffle=True, drop_last=True)
+validation_loader = DataLoader(xy_val, batch_size=batch_size, drop_last=True)
+
+our_model = NeuralNetwork().to(device)
+criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
+optimizer = torch.optim.Adam(our_model.parameters(), lr = 0.001)
+scheduler = ReduceLROnPlateau(optimizer, 'min')
+
+for epoch in range(EPOCHS):
+    #print('EPOCH {}:'.format(epoch_number + 1))
+
+    # Make sure gradient tracking is on, and do a pass over the data
+    our_model.train(True)
+
+    iters  = []
+    epoch_loss = 0.
+    val_iters = []
+    vepoch_loss = 0.
+    for i, data in enumerate(training_loader):
+        # Every data instance is an input + label pair
+        inputs, labels = data
+        inputs = inputs.view(inputs.size(0), -1)
+        labels = labels.view(labels.size(0), -1)
+        # Zero your gradients for every batch!
+        optimizer.zero_grad()
+
+        # Make predictions for this batch
+        outputs = our_model(inputs)
+
+        # Compute the loss and its gradients
+        loss = criterion(outputs, labels)
+        loss.backward()
+
+        del outputs
+        del labels
+
+        # Adjust learning weights
+        optimizer.step()
+
+        # save the current training information
+        iters.append(i)
+        batch_mse = loss/inputs.size(0)
+        del batch_mse
+        epoch_loss += float(loss) #added float to address the memory issues
+    
+    our_model.train(False)
+
+    for i, vdata in enumerate(validation_loader):
+        vinputs, vlabels = vdata
+        vinputs = vinputs.view(vinputs.size(0), -1)
+        vlabels = vlabels.view(vlabels.size(0), -1)
+        voutputs = our_model(vinputs)
+        vloss = criterion(voutputs, vlabels)
+
+        del voutputs
+        del vlabels
+
+        val_iters.append(i)
+        vbatch_mse = vloss/vinputs.size(0)
+        del vbatch_mse
+        vepoch_loss += float(vloss)
+
+    epoch_mse = epoch_loss/(len(iters) * inputs.size(0))
+    vepoch_mse = vepoch_loss/(len(val_iters) * vinputs.size(0))
+    print('EPOCH: {} LOSS train {} valid {}'.format(epoch_number, epoch_mse, vepoch_mse),end="\r")
+
+    del epoch_loss
+    del vepoch_loss
+    del inputs
+    del vinputs
+    
+    #This step to is determine whether the scheduler needs to be used 
+    scheduler.step(vepoch_mse)
+
+    #Create a loss_curve
+    loss_list.append(epoch_mse)
+    val_list.append(vepoch_mse)
+
+    writer.add_scalar("loss/train", epoch_mse, epoch_number)
+    writer.add_scalar("loss/validation", vepoch_mse, epoch_number)
+    #writer.add_scalar("learning rate", scheduler._last_lr)
+    epoch_number += 1
+
+    del epoch_mse
+    del vepoch_mse
 
 print("Time taken", time.time() - start_time)
+writer.flush()
+writer.close()
 
-#Plots the loss curve for training and validation data set
-plt.figure()
-plt.semilogy(np.arange(1, len(loss_list)+1), loss_list, color='#5B2C6F')
-plt.semilogy(np.arange(1, len(val_list)+1), val_list, color='#0096FF')
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.savefig('loss_curve_10.pdf')
+scheduler.optimizer.param_groups[0]['lr']
+optimizer.state
 
-
+our_model.train(False)
 #Time taken to predict the match on the test dataset  
 with torch.no_grad():
     pred_start_time = time.time()
@@ -126,7 +183,6 @@ with torch.no_grad():
 print("Total time taken", end_time - pred_start_time)
 print("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test))
 
-#Plots the distribution of errors for the test data
 error = to_cpu_np(y_prediction[:, 0] - y_test)
 
 #Determine the values it is failing
@@ -138,21 +194,43 @@ for x, y in zip(error, x_real):
     else:
         pass
 
-plt.figure()
-plt.hist(error, bins=50, color='#5B2C6F')
-plt.xlabel('Error')
-plt.ylabel('Count')
-plt.savefig('error_10.pdf', dpi=300)
+#Save the Neural Network 
+#torch.save(our_model.state_dict(), '/users/sgreen/GPU/Width/100000_mass_model.pth')
+
+#A really complicated way of getting the list off the GPU and into a numpy array
+loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
+val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
+
+#np.savetxt("1000000_mass_training.csv", loss_array, delimiter=",")
+#np.savetxt("1000000_mass_validation.csv", val_loss_array, delimiter=",")
+
+#Plots the loss curve for training and validation data set
+plt.figure(figsize=(8.2, 6.2))
+plt.semilogy(np.arange(1, len(loss_array)+1), loss_array, color='#5B2C6F', label='Training Loss')
+plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF', label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.savefig('100000_mass_loss_curve_plot.pdf')
 
 #Creates plots to compare the actual and predicted matches 
-plt.figure()
-plt.scatter(to_cpu_np(y_test), to_cpu_np(y_prediction[:, 0]), color='#5B2C6F')
-plt.xlabel('Actual match')
-plt.ylabel('Predicted match')
-plt.savefig('test_prediction_10.pdf', dpi=300)
+plt.figure(figsize=(8, 6))
+x = to_cpu_np(y_test)
+y = to_cpu_np(y_prediction[:, 0])
+plt.scatter(x,y, s=2, color='#0096FF')
+plt.axline((0, 0), slope=1, color='k')
+plt.xlabel('Actual Match')
+plt.ylabel('Predicted Match')
+plt.savefig('100000_mass_actual_predicted_plot.pdf', dpi=300)
 
-plt.hist2d(to_cpu_np(y_test), to_cpu_np(y_prediction[:, 0]))
-plt.xlabel('Actual match')
-plt.ylabel('Predicted match')
-plt.savefig('test_prediction_hist_10.pdf', dpi=300)
-
+#Creates plots to compare the errors
+plt.figure(figsize=(12, 10))
+plt.hist(error, bins=50, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
+plt.hist(error[x > .95], bins=50, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
+plt.xlim([error.min(), error.max()])
+plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
+plt.yscale('log')
+plt.xlabel('Error')
+plt.ylabel('Count')
+plt.legend(loc='upper left')
+plt.savefig('100000_mass_error_plot.pdf', dpi=300)

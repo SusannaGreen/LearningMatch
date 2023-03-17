@@ -75,8 +75,7 @@ TestBank.mass1.values, TestBank.mass2.values,
 TestBank.ref_spin1.values, TestBank.ref_spin2.values,
 TestBank.spin1.values, TestBank.spin2.values)).T
 y_test = TestBank.match.values
-x_real = scaler.inverse_transform(x_test)
-y_real = np.arccos(y_test)
+#x_real = scaler.inverse_transform(x_test)
 
 #Convert a numpy array to a Tensor
 x_train = torch.tensor(x_train, dtype=torch.float32, device='cuda')
