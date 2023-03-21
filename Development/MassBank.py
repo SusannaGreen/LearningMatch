@@ -6,7 +6,7 @@ from pycbc.filter import matchedfilter
 from pycbc.psd.analytical import aLIGOaLIGO175MpcT1800545
 from pycbc.waveform import get_fd_waveform, get_td_waveform
 
-SIZE = 100000
+SIZE = 10000
 LOW_FREQ = 12
 
 #Defining the PSD
@@ -16,8 +16,8 @@ delta_f = 1.0 / tlen
 psd = aLIGOaLIGO175MpcT1800545(1+tlen*sample_rate//2, delta_f=delta_f, low_freq_cutoff=LOW_FREQ)
 
 #Training dataset
-mass = np.random.uniform(2.0, 100, size=(SIZE,2))
-reference_mass = np.random.uniform(2.0, 100, size=(SIZE,2))
+mass = np.random.uniform(3.0, 100, size=(SIZE,2))
+reference_mass = np.random.uniform(3.0, 100, size=(SIZE,2))
 
 parameters_list = []
 match_time = []
@@ -33,10 +33,10 @@ for ref_m1, ref_m2, m1, m2 in zip(reference_mass[:, 0], reference_mass[:, 1], ma
     parameters_list.append([ref_m1, ref_m2, m1, m2, match])
 
 MassMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'match'])
-MassMatchDataset.to_csv('100000MassMatchDataset2.csv', index = False)
+MassMatchDataset.to_csv('10000MassMatchDataset.csv', index = False)
 
 print("The size of the dataset", SIZE)
-print("This generated a dataset called: 1000000MassMatchDataset")
+print("This generated a dataset called: 10000MassMatchDataset")
 print(MassMatchDataset.head())
 print("Time taken to generate this template bank", time.time() - start_time)
 print("Total time taken to calculate all the match values", sum(match_time))

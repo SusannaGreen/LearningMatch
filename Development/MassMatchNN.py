@@ -148,17 +148,54 @@ for x, y in zip(error, x_real):
     else:
         pass
 
-plt.figure()
-plt.hist(error, bins=50, color='#5B2C6F')
-plt.xlabel('Error')
-plt.ylabel('Count')
-plt.savefig('100000_error.pdf', dpi=300)
+#Save the Neural Network 
+torch.save(our_model.state_dict(), '/users/sgreen/GPU/Width/1000000_mass_model.pth')
+
+#A really complicated way of getting the list off the GPU and into a numpy array
+loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
+val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
+
+np.savetxt("1000000_mass_training.csv", loss_array, delimiter=",")
+np.savetxt("1000000_mass_validation.csv", val_loss_array, delimiter=",")
+
+#Plots the loss curve for training and validation data set
+plt.figure(figsize=(8.2, 6.2))
+plt.semilogy(np.arange(1, len(loss_array)+1), loss_array, color='#5B2C6F', label='Training Loss')
+plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF', label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.savefig('1000000_mass_loss_curve_plot.pdf')
 
 #Creates plots to compare the actual and predicted matches 
-plt.figure()
-plt.scatter(to_cpu_np(y_test), to_cpu_np(y_prediction[:, 0]), color='#5B2C6F')
-plt.xlabel('Actual match')
-plt.ylabel('Predicted match')
-plt.savefig('100000_test_prediction.pdf', dpi=300)
+plt.figure(figsize=(8, 6))
+x = to_cpu_np(y_test)
+y = to_cpu_np(y_prediction[:, 0])
+plt.scatter(x,y, s=2, color='#0096FF')
+plt.axline((0, 0), slope=1, color='k')
+plt.xlabel('Actual Match')
+plt.ylabel('Predicted Match')
+plt.savefig('1000000_mass_actual_predicted_plot.pdf', dpi=300)
 
+#Creates plots to compare the errors
+plt.figure(figsize=(9, 7))
+plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
+plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
+plt.xlim([error.min(), error.max()])
+plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
+plt.yscale('log')
+plt.xlabel('Error')
+plt.ylabel('Count')
+plt.legend(loc='upper left')
+plt.savefig('1000000_mass_error_plot.pdf', dpi=300)
 
+#Creates a Actual Match and Predicted Match plot with residuals
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
+ax1.scatter(x,y, s=2, color='#0096FF')
+ax1.axline((0, 0), slope=1, color='k')
+
+sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'linewidth':20})
+
+fig.supxlabel('Actual Match')
+fig.supylabel('Predicted Match')
+plt.savefig('1000000_mass_actual_predicted_plot_with residuals.pdf', dpi=300)

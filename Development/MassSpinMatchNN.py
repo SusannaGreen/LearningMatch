@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import time
-import matplotlib.pyplot as plt
+import seaborn as sns
 import logging
 
 from sklearn import preprocessing
@@ -117,14 +117,14 @@ loss_list = []
 val_list = []
 
 epoch_number = 0
-EPOCHS = 200
+EPOCHS = 300
 batch_size = 64
 training_loader  = DataLoader(xy_train, batch_size=batch_size, shuffle=True, drop_last=True)
 validation_loader = DataLoader(xy_val, batch_size=batch_size, drop_last=True)
 
 our_model = NeuralNetwork().to(device)
 criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
-optimizer = torch.optim.Adam(our_model.parameters(), lr = 0.001)
+optimizer = torch.optim.Adam(our_model.parameters(), lr = 1e-5)#change learning rate 10e-4
 scheduler = ReduceLROnPlateau(optimizer, 'min')
 
 for epoch in range(EPOCHS):
@@ -264,9 +264,9 @@ plt.ylabel('Predicted Match')
 plt.savefig('1000000_mass_spin_actual_predicted_plot.pdf', dpi=300)
 
 #Creates plots to compare the errors
-plt.figure(figsize=(12, 10))
-plt.hist(error, bins=50, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
-plt.hist(error[x > .95], bins=50, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
+plt.figure(figsize=(9, 7))
+plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
+plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
 plt.xlim([error.min(), error.max()])
 plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
 plt.yscale('log')
@@ -274,3 +274,14 @@ plt.xlabel('Error')
 plt.ylabel('Count')
 plt.legend(loc='upper left')
 plt.savefig('1000000_mass_spin_error_plot.pdf', dpi=300)
+
+#Creates a Actual Match and Predicted Match plot with residuals
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
+ax1.scatter(x,y, s=2, color='#0096FF')
+ax1.axline((0, 0), slope=1, color='k')
+
+sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'linewidth':20})
+
+fig.supxlabel('Actual Match')
+fig.supylabel('Predicted Match')
+plt.savefig('1000000_mass_spin_actual_predicted_plot_with residuals.pdf', dpi=300)
