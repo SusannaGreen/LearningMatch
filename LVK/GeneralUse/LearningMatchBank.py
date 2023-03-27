@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (C) 2023 Susanna M. Green, Andrew Lundgren, and Xan Morice-Atkinson 
 import numpy as np
 import pandas as pd
