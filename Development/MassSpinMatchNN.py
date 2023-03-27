@@ -48,10 +48,10 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
 
 #Upload the data
-TemplateBank = pd.read_csv(r'Unsorted1000000MassSpinTemplateBank.csv')
+TemplateBank = pd.read_csv(r'1000000MassSpinMatchDataset.csv')
 
 #Split the data
-TrainingBank, TestValidationBank = model_selection.train_test_split(TemplateBank, test_size=0.1)
+TrainingBank, TestValidationBank = model_selection.train_test_split(TemplateBank, test_size=0.001)
 TestBank, ValidationBank = model_selection.train_test_split(TestValidationBank, test_size=0.5)
 print(f'The data size of the training, validation and test dataset is {len(TrainingBank), len(ValidationBank), len(TestBank)}, respectively')
 
@@ -79,7 +79,7 @@ TestBank.mass1.values, TestBank.mass2.values,
 TestBank.ref_spin1.values, TestBank.ref_spin2.values,
 TestBank.spin1.values, TestBank.spin2.values)).T
 y_test = TestBank.match.values
-#x_real = scaler.inverse_transform(x_test)
+x_real = scaler.inverse_transform(x_test)
 
 #Convert a numpy array to a Tensor
 x_train = torch.tensor(x_train, dtype=torch.float32, device='cuda')
@@ -117,14 +117,14 @@ loss_list = []
 val_list = []
 
 epoch_number = 0
-EPOCHS = 300
+EPOCHS = 500
 batch_size = 64
 training_loader  = DataLoader(xy_train, batch_size=batch_size, shuffle=True, drop_last=True)
 validation_loader = DataLoader(xy_val, batch_size=batch_size, drop_last=True)
 
 our_model = NeuralNetwork().to(device)
 criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
-optimizer = torch.optim.Adam(our_model.parameters(), lr = 1e-5)#change learning rate 10e-4
+optimizer = torch.optim.Adam(our_model.parameters(), lr = 1e-4)
 scheduler = ReduceLROnPlateau(optimizer, 'min')
 
 for epoch in range(EPOCHS):
@@ -235,14 +235,14 @@ for x, y in zip(error, x_real):
         pass
 
 #Save the Neural Network 
-torch.save(our_model.state_dict(), '/users/sgreen/GPU/Width/1000000_mass_spin_model.pth')
+torch.save(our_model.state_dict(), '/users/sgreen/LearningMatch/Development/1000000_mass_spin_model_3.pth')
 
 #A really complicated way of getting the list off the GPU and into a numpy array
 loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
 val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
 
-np.savetxt("1000000_mass_spin_training.csv", loss_array, delimiter=",")
-np.savetxt("1000000_mass_spin_validation.csv", val_loss_array, delimiter=",")
+np.savetxt("mass_spin_training_1000000_3.csv", loss_array, delimiter=",")
+np.savetxt("mass_spin_validation_1000000_3.csv", val_loss_array, delimiter=",")
 
 #Plots the loss curve for training and validation data set
 plt.figure(figsize=(8.2, 6.2))
@@ -251,7 +251,7 @@ plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig('1000000_mass_spin_loss_curve_plot.pdf')
+plt.savefig('1000000_mass_spin_loss_curve_plot_3.pdf')
 
 #Creates plots to compare the actual and predicted matches 
 plt.figure(figsize=(8, 6))
@@ -261,7 +261,7 @@ plt.scatter(x,y, s=2, color='#0096FF')
 plt.axline((0, 0), slope=1, color='k')
 plt.xlabel('Actual Match')
 plt.ylabel('Predicted Match')
-plt.savefig('1000000_mass_spin_actual_predicted_plot.pdf', dpi=300)
+plt.savefig('1000000_mass_spin_actual_predicted_plot_3.pdf', dpi=300)
 
 #Creates plots to compare the errors
 plt.figure(figsize=(9, 7))
@@ -273,15 +273,16 @@ plt.yscale('log')
 plt.xlabel('Error')
 plt.ylabel('Count')
 plt.legend(loc='upper left')
-plt.savefig('1000000_mass_spin_error_plot.pdf', dpi=300)
+plt.savefig('1000000_mass_spin_error_plot_3.pdf', dpi=300)
 
 #Creates a Actual Match and Predicted Match plot with residuals
 fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
-ax1.scatter(x,y, s=2, color='#0096FF')
+ax1.scatter(x,y, s=8, color='#0096FF')
 ax1.axline((0, 0), slope=1, color='k')
+ax1.set_ylabel('Predicted Match')
 
 sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'linewidth':20})
+ax2.set_ylabel('Error')
 
 fig.supxlabel('Actual Match')
-fig.supylabel('Predicted Match')
-plt.savefig('1000000_mass_spin_actual_predicted_plot_with residuals.pdf', dpi=300)
+plt.savefig('1000000_mass_spin_actual_predicted_plot_with residuals_3.pdf', dpi=300)

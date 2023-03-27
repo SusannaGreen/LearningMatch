@@ -1,20 +1,6 @@
 #!/usr/bin/env python
 
 # Copyright (C) 2023 Susanna M. Green, Andrew Lundgren, and Xan Morice-Atkinson 
-#
-# This program is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
-# Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import os
 import numpy as np
@@ -59,18 +45,6 @@ layout = {
 }
 writer.add_custom_scalars(layout)
 
-#Defining functions
-def to_cpu_np(x):
-    return x.cpu().detach().numpy()
-
-def scaling_the_mass(mass):
-    scaled_mass = (mass - 51)/ np.sqrt(799)
-    return scaled_mass
-
-def rescaling_the_mass(mass):
-    rescaled_mass = mass* np.sqrt(799) + 51
-    return rescaled_mass
-
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -105,6 +79,18 @@ TestBank.ref_spin1.values, TestBank.ref_spin2.values,
 TestBank.spin1.values, TestBank.spin2.values)).T
 y_test = TestBank.match.values
 
+
+#Defining functions
+def to_cpu_np(x):
+    return x.cpu().detach().numpy()
+    
+def scaling_the_mass(mass):
+    scaled_mass = (mass - 51)/ np.sqrt(799)
+    return scaled_mass
+
+def rescaling_the_mass(mass):
+    rescaled_mass = mass* np.sqrt(799) + 51
+    return rescaled_mass
 logging.info("COnverting to datasets to a trainloader")
 #Convert a numpy array to a Tensor
 x_train = torch.tensor(x_train, dtype=torch.float32, device='cuda')
