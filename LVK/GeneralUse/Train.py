@@ -1,56 +1,56 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2023 Susanna M. Green, Andrew Lundgren, and Xan Morice-Atkinson 
+# Copyright (C) 2023 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
 
-from LearningMatchModel.py import NeuralNetwork
+from Model import NeuralNetwork
 
-import os
 import numpy as np
 import pandas as pd
 import time
-import argparse
 import logging
 
-from sklearn import model_selection
-
-from scipy.stats import gaussian_kde
+from sklearn import preprocessing
+from joblib import dump
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
-#Define where to find the relavent datasets
-TRAINING_BANK = r'/users/sgreen/LearningMatch/Development/MassSpinTrainingBank.csv'
-VALIDATION_BANK = r'/users/sgreen/LearningMatch/Development/MassSpinValidationBank.csv'
+#Define location to the training and validation dataset
+TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTrainingBank.csv'
+VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinValidationBank.csv'
 
-#Define values for the training of the model
+#Define ouput location of the Standard.Scaler()
+STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/GeneralUse/std_scaler.bin'
+
+#Define output location of the LearningMatch model
+LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/GeneralUse/LearningMatchModel.pth'
+
+#Define output location for the training and validation loss
+LOSS = '/users/sgreen/LearningMatch/LVK/GeneralUse/TrainingValidationLoss.csv'
+
+#Define values for the LearningMatch model
 EPOCHS = 200
 BATCH_SIZE = 64
 LEARNING_RATE = 1e-4
 
-#Define where to save the trained model and other outputs for the LearningMatchplots.py
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/Development/LearningMatchModel.pth'
-TRAINING_LOSS = '/users/sgreen/LearningMatch/Development/TrainingLoss.csv'
-VALIDATION_LOSS = '/users/sgreen/LearningMatch/Development/ValidationLoss.csv'
-
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using {device} device")
+logging.info(f"Using {device} device")
 
 #Reading the Training, validation and test dataset
 logging.info("Reading in the data")
-TrainingBank = pd.read_csv(TRAINING_BANK)
-ValidationBank = pd.read_csv(VALIDATION_BANK)
+TrainingBank = pd.read_csv(TRAINING_DATASET_FILE_PATH)
+ValidationBank = pd.read_csv(VALIDATION_DATASET_FILE_PATH)
 logging.info(f'The data size of the training and validation dataset is {len(TrainingBank), len(ValidationBank)}, respectively')
 
 #Using Standard.scalar() to re-scale the Training Bank and applying to the validation and test bank. 
 scaler = preprocessing.StandardScaler()
 TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.fit_transform(TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
 ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
-TestBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(TestBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
 scaler_mean = scaler.mean_
-scaler_std = scaler.std_
+scaler_std = scaler.var_
 logging.info(f'IMPORTANT: The mean of the standard scaler is {scaler_mean}')
 logging.info(f'IMPORTANT: The standard deviation of the standard scaler is {scaler_std}')
 
@@ -90,12 +90,9 @@ scheduler = ReduceLROnPlateau(optimizer, 'min')
 logging.info("Model successfully loaded")
 
 loss_list = []
-val_list = []
 
 epoch_number = 0
 for epoch in range(EPOCHS):
-    #print('EPOCH {}:'.format(epoch_number + 1))
-
     # Make sure gradient tracking is on, and do a pass over the data
     our_model.train(True)
 
@@ -149,7 +146,7 @@ for epoch in range(EPOCHS):
 
     epoch_mse = epoch_loss/(len(iters) * inputs.size(0))
     vepoch_mse = vepoch_loss/(len(val_iters) * vinputs.size(0))
-    print('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse),end="\r")
+    logging.info('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse),end="\r")
 
     del epoch_loss
     del vepoch_loss
@@ -160,26 +157,22 @@ for epoch in range(EPOCHS):
     scheduler.step(vepoch_mse)
 
     #Create a loss_curve
-    loss_list.append(epoch_mse)
-    val_list.append(vepoch_mse)
+    loss_list.append([epoch_mse, vepoch_mse])
 
     epoch_number += 1
 
     del epoch_mse
     del vepoch_mse
 
-print("Time taken", time.time() - start_time)
-writer.flush()
-writer.close()
+#Creates a file with the training and validation loss
+loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy() #Gets the list off the GPU and into a numpy array
+MassSpinMatchDataset =  pd.DataFrame(data=(loss_array), columns=['training_loss', 'validation_loss'])
+MassSpinMatchDataset.to_csv(LOSS, index = False)
 
-#A really complicated way of getting the list off the GPU and into a numpy array
-loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
-val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
-
-np.savetxt(TRAINING_LOSS, loss_array, delimiter=",")
-np.savetxt(VALIDATION_LOSS, val_loss_array, delimiter=",")
-
-#Save the Neural Network 
+#Save the trained LearningMatch model 
 torch.save(our_model.state_dict(), LEARNINGMATCH_MODEL)
+
+#Save the StandardScaler.()
+dump(scaler, STANDARD_SCALER, compress=True)
 
 
