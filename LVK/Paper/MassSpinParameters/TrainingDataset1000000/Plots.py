@@ -23,21 +23,21 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTestDataset.csv'
+TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/1000MassSpinTestBankDataset.csv'
 
 #Define location of the scaling
-SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/GeneralUse/std_scaler.bin'
+SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/std_scaler.bin'
 
 #Define location of the trained LearningMatch model 
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/GeneralUse/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = r'/users/sgreen/LearningMatch/LVK/GeneralUse/TrainingValidationLoss.csv'
+LOSS_FILE = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = '/users/sgreen/LearningMatch/LVK/GeneralUse/LossCurve.pdf'
-ERROR_HISTOGRAM = '/users/sgreen/LearningMatch/LVK/GeneralUse/Error.pdf'
-ACTUAL_PREDICTED_PLOT = '/users/sgreen/LearningMatch/LVK/GeneralUse/ActualPredicted.pdf'
+LOSS_CURVE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/LossCurve.pdf'
+ERROR_HISTOGRAM = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/Error.pdf'
+ACTUAL_PREDICTED_PLOT = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/ActualPredicted.pdf'
 
 #Define the functions
 def to_cpu_np(x):

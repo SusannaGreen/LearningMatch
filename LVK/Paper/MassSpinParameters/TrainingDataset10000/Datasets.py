@@ -11,14 +11,14 @@ from pycbc.psd.analytical import aLIGOaLIGO175MpcT1800545
 from pycbc.waveform import get_fd_waveform, get_td_waveform
 
 #Define the output location for the training, validation and test dataset
-TRAINING_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinValidationDataset.csv'
-TEST_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTestDataset.csv'
+TRAINING_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/10000MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinValidationDataset.csv'
+TEST_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
-TRAINING_SIZE = 1000 #size of the training dataset
-VALIDATION_SIZE = 100 #size of the validation dataset
-TEST_SIZE = 100 #size of the test dataset
+TRAINING_SIZE = 10000 #size of the training dataset
+VALIDATION_SIZE = 5000 #size of the validation dataset
+TEST_SIZE = 5000 #size of the test dataset
 
 #Define the detector
 LOW_FREQ = 12 #frequency cut-off for the GW detector

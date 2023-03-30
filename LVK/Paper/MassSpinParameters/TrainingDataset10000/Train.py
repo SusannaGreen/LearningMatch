@@ -18,17 +18,17 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/10000MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/GeneralUse/std_scaler.bin'
+STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/std_scaler.bin'
 
 #Define output location of the LearningMatch model
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/GeneralUse/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = '/users/sgreen/LearningMatch/LVK/GeneralUse/TrainingValidationLoss.csv'
+LOSS = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
 EPOCHS = 200
