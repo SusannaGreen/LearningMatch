@@ -22,7 +22,7 @@ TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSp
 VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/GeneralUse/std_scaler.bin'
+STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/GeneralUse/StandardScaler.bin'
 
 #Define output location of the LearningMatch model
 LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/GeneralUse/LearningMatchModel.pth'

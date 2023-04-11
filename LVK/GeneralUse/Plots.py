@@ -23,10 +23,13 @@ matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/GeneralUse/MassSpinTestDataset.csv'
+DATA_DIR = r'/users/sgreen/LearningMatch/LVK/GeneralUse/'
+
+#Define location of the test dataset
+TEST_DATASET_FILE_PATH = DATA_DIR+'MassSpinTestDataset.csv'
 
 #Define location of the scaling
-SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/GeneralUse/std_scaler.bin'
+SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/GeneralUse/StandardScaler.bin'
 
 #Define location of the trained LearningMatch model 
 LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/GeneralUse/LearningMatchModel.pth'
@@ -82,8 +85,8 @@ with torch.no_grad():
     torch.cuda.synchronize()
     end_time = time.time()
 
-logging.info(("Total time taken", end_time - pred_start_time)
-logging.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test))
+logging.info(("Total time taken", end_time - pred_start_time))
+logging.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test)))
 
 #Plots the loss curve for training and validation data set
 logging.info("Creating a loss curve which compares the training loss with validation loss")  
