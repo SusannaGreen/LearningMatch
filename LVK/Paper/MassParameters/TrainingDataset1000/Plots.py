@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2023 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
+
+from Model import NeuralNetwork
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import logging
+import time 
+
+from sklearn import preprocessing
+from joblib import load
+
+import torch
+import torch.nn as nn
+
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.rcParams.update({'font.size': 20})
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
+#Define location of the test dataset
+TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/5000MassTestDataset.csv'
+
+#Define location of the scaling
+SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/StandardScaler.bin'
+
+#Define location of the trained LearningMatch model 
+LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/LearningMatchModel.pth'
+
+#Define location of the loss File
+LOSS_FILE = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/TrainingValidationLoss.csv'
+
+#Defining the location of the outputs
+LOSS_CURVE = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/LossCurve.pdf'
+ERROR_HISTOGRAM = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/Error.pdf'
+ACTUAL_PREDICTED_PLOT = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/ActualPredicted.pdf'
+
+#Define the functions
+def to_cpu_np(x):
+    return x.cpu().detach().numpy()
+
+#Check that Pytorch recognises there is a GPU available
+device = "cuda" if torch.cuda.is_available() else "cpu"
+logging.info(f"Using {device} device")    
+
+#Reading the test dataset
+logging.info("Reading in the test dataset")
+test_dataset = pd.read_csv(TEST_DATASET_FILE_PATH)
+logging.info(f'The size of the test dataset is {len(test_dataset)}')
+
+#Scaling the test dataset
+logging.info("Scaling the test dataset")
+scaler = load(SCALER_FILE_PATH)
+test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
+
+#Convert to a Tensor
+logging.info("Converting the test dataset into a tensor")
+x_test = np.vstack((test_dataset.ref_mass1.values, test_dataset.ref_mass2.values, 
+test_dataset.mass1.values, test_dataset.mass2.values)).T
+y_test = test_dataset.match.values
+
+x_test = torch.tensor(x_test, dtype=torch.float32, device='cuda')
+y_test = torch.tensor(y_test, dtype=torch.float32, device='cuda')
+
+#Upload the already trained weights and bias
+logging.info("Loading the LearningMatch model")
+model = NeuralNetwork().to(device)
+model.load_state_dict(torch.load(LEARNINGMATCH_MODEL, map_location=device))
+model.eval()
+
+#Time taken to predict the match on the test dataset
+logging.info("LearningMatch is predicting the Match for your dataset")  
+with torch.no_grad():
+    pred_start_time = time.time()
+    y_prediction = model(x_test) 
+    torch.cuda.synchronize()
+    end_time = time.time()
+
+logging.info(("Total time taken", end_time - pred_start_time))
+logging.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test)))
+
+#Plots the loss curve for training and validation data set
+logging.info("Creating a loss curve which compares the training loss with validation loss")  
+
+Loss = pd.read_csv(LOSS_FILE)
+validation_loss = Loss.validation_loss.values
+training_loss = Loss.training_loss.values
+
+plt.figure(figsize=(8.2, 6.2))
+plt.semilogy(np.arange(1, len(training_loss)+1), training_loss, color='#5B2C6F', label='Training Loss')
+plt.semilogy(np.arange(1, len(validation_loss)+1), validation_loss, color='#0096FF', label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.savefig(LOSS_CURVE)
+
+#Creates a plot that compares the actual match values with LearningMatch's predicted match values 
+logging.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
+
+x = to_cpu_np(y_test)
+y = to_cpu_np(y_prediction[:, 0])
+
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
+ax1.scatter(x,y, s=8, color='#0096FF')
+ax1.axline((0, 0), slope=1, color='k')
+ax1.set_ylabel('Predicted Match')
+
+sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'linewidth':20})
+ax2.set_ylabel('Error')
+
+fig.supxlabel('Actual Match')
+plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300)
+
+#Creates a histogram of the errors
+logging.info("Creating a histogram of the errors") 
+
+error = to_cpu_np(y_prediction[:, 0] - y_test)
+
+plt.figure(figsize=(9, 7))
+plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
+plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
+plt.xlim([error.min(), error.max()])
+plt.xticks([-0.05, -0.01, 0.01, 0.05])
+plt.yscale('log')
+plt.xlabel('Error')
+plt.ylabel('Count')
+plt.legend(loc='upper left')
+plt.savefig(ERROR_HISTOGRAM, dpi=300)
+
