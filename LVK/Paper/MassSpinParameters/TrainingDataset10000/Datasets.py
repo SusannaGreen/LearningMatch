@@ -12,12 +12,12 @@ from pycbc.waveform import get_fd_waveform, get_td_waveform
 
 #Define the output location for the training, validation and test dataset
 TRAINING_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/10000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinValidationDataset.csv'
+VALIDATION_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/1000MassSpinValidationDataset.csv'
 TEST_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
 TRAINING_SIZE = 10000 #size of the training dataset
-VALIDATION_SIZE = 5000 #size of the validation dataset
+VALIDATION_SIZE = 1000 #size of the validation dataset
 TEST_SIZE = 5000 #size of the test dataset
 
 #Define the detector
@@ -62,8 +62,8 @@ def dataset_generation(size_of_dataset, output_of_dataset):
 
 #Generate the training, validation and test dataset
 logging.info("Creating the training dataset")
-dataset_generation(TRAINING_SIZE, TRAINING_DATASET_FILE)
+#dataset_generation(TRAINING_SIZE, TRAINING_DATASET_FILE)
 logging.info("Creating the validation dataset")
 dataset_generation(VALIDATION_SIZE, VALIDATION_DATASET_FILE)
 logging.info("Creating the test dataset")
-dataset_generation(TEST_SIZE, TEST_DATASET_FILE)
+#dataset_generation(TEST_SIZE, TEST_DATASET_FILE)

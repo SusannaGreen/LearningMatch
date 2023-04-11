@@ -19,7 +19,7 @@ from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
 #Define location to the training and validation dataset
 TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/10000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/5000MassSpinValidationDataset.csv'
+VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/1000MassSpinValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
 STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/std_scaler.bin'
