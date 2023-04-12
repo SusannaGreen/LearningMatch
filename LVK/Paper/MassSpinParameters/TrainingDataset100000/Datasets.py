@@ -7,13 +7,24 @@ import time
 import logging 
 
 from pycbc.filter import matchedfilter
-from pycbc.psd.analytical import aLIGOaLIGO175MpcT1800545
+from pycbc.psd.analytical import aLIGO175MpcT1800545
 from pycbc.waveform import get_fd_waveform, get_td_waveform
 
-#Define the output location for the training, validation and test dataset
-TRAINING_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/100000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/5000MassSpinValidationDataset.csv'
-TEST_DATASET_FILE = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/5000MassSpinTestDataset.csv'
+#Set-up the logging 
+logger = logging.getLogger(__name__)  
+logger.setLevel(logging.INFO) # set log level 
+
+file_handler = logging.FileHandler('Datasets.log') # define file handler and set formatter
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+#Define directory for the output 
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/'
+
+#Define the the training, validation and test dataset
+TRAINING_DATASET_FILE = DATA_DIR+'100000MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE = DATA_DIR+'5000MassSpinValidationDataset.csv'
+TEST_DATASET_FILE = DATA_DIR+'5000MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
 TRAINING_SIZE = 100000 #size of the training dataset
@@ -25,7 +36,7 @@ LOW_FREQ = 12 #frequency cut-off for the GW detector
 SAMPLE_RATE = 4096 #sampling rate of desired detector
 TLEN = 128
 DELTA_F = 1.0 / TLEN
-PSD = aLIGOaLIGO175MpcT1800545(1+TLEN*SAMPLE_RATE//2, delta_f=DELTA_F, low_freq_cutoff=LOW_FREQ) 
+PSD = aLIGO175MpcT1800545(1+TLEN*SAMPLE_RATE//2, delta_f=DELTA_F, low_freq_cutoff=LOW_FREQ) 
 
 #Define the template you want LearningMatch to learn
 TEMPLATE = 'IMRPhenomXAS'
@@ -56,6 +67,10 @@ def dataset_generation(size_of_dataset, output_of_dataset):
         match, Index = template.match(template_reference, psd=PSD, low_frequency_cutoff=15)
         match_time.append(time.time()-template_generation)
         parameters_list.append([ref_m1, ref_m2, m1, m2, ref_s1, ref_s2, s1, s2, match])
+
+    logger.info("Time taken to generate this dataset %s", time.time() - start_time)
+    logger.info("Total time taken to calculate the match %s", sum(match_time))
+    logger.info("The average time taken to calculate the match %s", sum(match_time)/len(match_time))
 
     MassSpinMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2', 'match'])
     MassSpinMatchDataset.to_csv(output_of_dataset, index = False)

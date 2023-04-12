@@ -17,42 +17,51 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
+#Set-up the logging 
+logger = logging.getLogger(__name__)  
+logger.setLevel(logging.INFO) # set log level 
+
+file_handler = logging.FileHandler('Train.log') # define file handler and set formatter
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler) # add file handler to logger
+
+#Define directory of the input and output files 
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/'
+
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/10000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/1000MassSpinValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = DATA_DIR+r'10000MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'1000MassSpinValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/std_scaler.bin'
+STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
 
 #Define output location of the LearningMatch model
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/TrainingValidationLoss.csv'
+LOSS = DATA_DIR+'TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
-EPOCHS = 200
-BATCH_SIZE = 64
-LEARNING_RATE = 1e-4
+EPOCHS = 500
+BATCH_SIZE = 16
+LEARNING_RATE = 1e-5
 
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
-logging.info(f"Using {device} device")
+logger.info(f"Using {device} device")
 
 #Reading the Training, validation and test dataset
-logging.info("Reading in the data")
+logger.info("Reading in the data")
 TrainingBank = pd.read_csv(TRAINING_DATASET_FILE_PATH)
 ValidationBank = pd.read_csv(VALIDATION_DATASET_FILE_PATH)
-logging.info(f'The data size of the training and validation dataset is {len(TrainingBank), len(ValidationBank)}, respectively')
+logger.info(f'The data size of the training and validation dataset is {len(TrainingBank), len(ValidationBank)}, respectively')
 
 #Using Standard.scalar() to re-scale the Training Bank and applying to the validation and test bank. 
 scaler = preprocessing.StandardScaler()
 TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.fit_transform(TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
 ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
-scaler_mean = scaler.mean_
-scaler_std = scaler.var_
-logging.info(f'IMPORTANT: The mean of the standard scaler is {scaler_mean}')
-logging.info(f'IMPORTANT: The standard deviation of the standard scaler is {scaler_std}')
 
 #Splitting into input (i.e. the template parameters) and output (the match)
 x_train = np.vstack((TrainingBank.ref_mass1.values, TrainingBank.ref_mass2.values, 
@@ -68,7 +77,7 @@ ValidationBank.spin1.values, ValidationBank.spin2.values)).T
 y_val = ValidationBank.match.values
 
 #Convert a numpy array to a Tensor
-logging.info("Converting to datasets to a trainloader")
+logger.info("Converting to datasets to a trainloader")
 x_train = torch.tensor(x_train, dtype=torch.float32, device='cuda')
 y_train = torch.tensor(y_train, dtype=torch.float32, device='cuda')
 x_val = torch.tensor(x_val, dtype=torch.float32, device='cuda')
@@ -82,12 +91,12 @@ xy_val = TensorDataset(x_val, y_val)
 training_loader  = DataLoader(xy_train, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
 validation_loader = DataLoader(xy_val, batch_size=BATCH_SIZE, drop_last=True)
 
-logging.info("Uploading the model")
+logger.info("Uploading the model")
 our_model = NeuralNetwork().to(device)
 criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
 optimizer = torch.optim.Adam(our_model.parameters(), lr = LEARNING_RATE)
 scheduler = ReduceLROnPlateau(optimizer, 'min')
-logging.info("Model successfully loaded")
+logger.info("Model successfully loaded")
 
 loss_list = []
 
@@ -146,7 +155,7 @@ for epoch in range(EPOCHS):
 
     epoch_mse = epoch_loss/(len(iters) * inputs.size(0))
     vepoch_mse = vepoch_loss/(len(val_iters) * vinputs.size(0))
-    logging.info('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse),end="\r")
+    logger.info('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse))
 
     del epoch_loss
     del vepoch_loss
