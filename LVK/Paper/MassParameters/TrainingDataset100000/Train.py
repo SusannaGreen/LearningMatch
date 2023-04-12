@@ -17,23 +17,36 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
+#Set-up the logging 
+logger = logging.getLogger(__name__)  
+logger.setLevel(logging.INFO) # set log level 
+
+file_handler = logging.FileHandler('logfile.log') # define file handler and set formatter
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler) # add file handler to logger
+
+#Define directory of the input and output files 
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/'
+
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/100000MassTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/10000MassValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = DATA_DIR+r'100000MassTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'10000MassValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/StandardScaler.bin'
+STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
 
 #Define output location of the LearningMatch model
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/TrainingValidationLoss.csv'
+LOSS = DATA_DIR+'TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
-EPOCHS = 200
+EPOCHS = 1000
 BATCH_SIZE = 16
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-5
 
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -142,7 +155,7 @@ for epoch in range(EPOCHS):
 
     epoch_mse = epoch_loss/(len(iters) * inputs.size(0))
     vepoch_mse = vepoch_loss/(len(val_iters) * vinputs.size(0))
-    logging.info('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse),end="\r")
+    logging.info('EPOCH: {} TRAINING LOSS {} VALIDATION LOSS {}'.format(epoch_number, epoch_mse, vepoch_mse))
 
     del epoch_loss
     del vepoch_loss

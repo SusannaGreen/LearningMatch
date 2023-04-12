@@ -22,22 +22,35 @@ matplotlib.rcParams.update({'font.size': 20})
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
+#Set-up the logging 
+logger = logging.getLogger(__name__)  
+logger.setLevel(logging.INFO) # set log level 
+
+file_handler = logging.FileHandler('Plots.log') # define file handler and set formatter
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler) # add file handler to logger
+
+#Define directory of the input and output files 
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/'
+
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/5000MassTestDataset.csv'
+TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassTestDataset.csv'
 
 #Define location of the scaling
-SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/StandardScaler.bin'
+SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
 
 #Define location of the trained LearningMatch model 
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/LossCurve.pdf'
-ERROR_HISTOGRAM = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/Error.pdf'
-ACTUAL_PREDICTED_PLOT = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset10000/ActualPredicted.pdf'
+LOSS_CURVE = DATA_DIR+'LossCurve.pdf'
+ERROR_HISTOGRAM = DATA_DIR+'Error.pdf'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'ActualPredicted.pdf'
 
 #Define the functions
 def to_cpu_np(x):
@@ -45,20 +58,20 @@ def to_cpu_np(x):
 
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
-logging.info(f"Using {device} device")    
+logger.info(f"Using {device} device")    
 
 #Reading the test dataset
-logging.info("Reading in the test dataset")
+logger.info("Reading in the test dataset")
 test_dataset = pd.read_csv(TEST_DATASET_FILE_PATH)
-logging.info(f'The size of the test dataset is {len(test_dataset)}')
+logger.info(f'The size of the test dataset is {len(test_dataset)}')
 
 #Scaling the test dataset
-logging.info("Scaling the test dataset")
+logger.info("Scaling the test dataset")
 scaler = load(SCALER_FILE_PATH)
 test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
 
 #Convert to a Tensor
-logging.info("Converting the test dataset into a tensor")
+logger.info("Converting the test dataset into a tensor")
 x_test = np.vstack((test_dataset.ref_mass1.values, test_dataset.ref_mass2.values, 
 test_dataset.mass1.values, test_dataset.mass2.values)).T
 y_test = test_dataset.match.values
@@ -67,24 +80,24 @@ x_test = torch.tensor(x_test, dtype=torch.float32, device='cuda')
 y_test = torch.tensor(y_test, dtype=torch.float32, device='cuda')
 
 #Upload the already trained weights and bias
-logging.info("Loading the LearningMatch model")
+logger.info("Loading the LearningMatch model")
 model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(LEARNINGMATCH_MODEL, map_location=device))
 model.eval()
 
 #Time taken to predict the match on the test dataset
-logging.info("LearningMatch is predicting the Match for your dataset")  
+logger.info("LearningMatch is predicting the Match for your dataset")  
 with torch.no_grad():
     pred_start_time = time.time()
     y_prediction = model(x_test) 
     torch.cuda.synchronize()
     end_time = time.time()
 
-logging.info(("Total time taken", end_time - pred_start_time))
-logging.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test)))
+logger.info(("Total time taken", end_time - pred_start_time))
+logger.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test)))
 
 #Plots the loss curve for training and validation data set
-logging.info("Creating a loss curve which compares the training loss with validation loss")  
+logger.info("Creating a loss curve which compares the training loss with validation loss")  
 
 Loss = pd.read_csv(LOSS_FILE)
 validation_loss = Loss.validation_loss.values
@@ -99,7 +112,7 @@ plt.legend()
 plt.savefig(LOSS_CURVE)
 
 #Creates a plot that compares the actual match values with LearningMatch's predicted match values 
-logging.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
+logger.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
 
 x = to_cpu_np(y_test)
 y = to_cpu_np(y_prediction[:, 0])
@@ -116,7 +129,7 @@ fig.supxlabel('Actual Match')
 plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300)
 
 #Creates a histogram of the errors
-logging.info("Creating a histogram of the errors") 
+logger.info("Creating a histogram of the errors") 
 
 error = to_cpu_np(y_prediction[:, 0] - y_test)
 

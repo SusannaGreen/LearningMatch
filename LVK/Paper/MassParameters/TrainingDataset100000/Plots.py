@@ -22,22 +22,35 @@ matplotlib.rcParams.update({'font.size': 20})
 matplotlib.rcParams['mathtext.fontset'] = 'stix'
 matplotlib.rcParams['font.family'] = 'STIXGeneral'
 
+#Set-up the logging 
+logger = logging.getLogger(__name__)  
+logger.setLevel(logging.INFO) # set log level 
+
+file_handler = logging.FileHandler('logfile.log') # define file handler and set formatter
+formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler) # add file handler to logger
+
+#Define directory of the input and output files 
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/'
+
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/5000MassTestDataset.csv'
+TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassTestDataset.csv'
 
 #Define location of the scaling
-SCALER_FILE_PATH = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/StandardScaler.bin'
+SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
 
 #Define location of the trained LearningMatch model 
-LEARNINGMATCH_MODEL = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/LearningMatchModel.pth'
+LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = r'/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/LossCurve.pdf'
-ERROR_HISTOGRAM = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/Error.pdf'
-ACTUAL_PREDICTED_PLOT = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/ActualPredicted.pdf'
+LOSS_CURVE = DATA_DIR+'LossCurve.pdf'
+ERROR_HISTOGRAM = DATA_DIR+'Error.pdf'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'ActualPredicted.pdf'
 
 #Define the functions
 def to_cpu_np(x):
@@ -104,7 +117,7 @@ logging.info("Creating a plot that compares tha actual match values with predict
 x = to_cpu_np(y_test)
 y = to_cpu_np(y_prediction[:, 0])
 
-fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
+fig, (ax1, ax2) = plt.subplots(2, figsize=(6, 10), sharex=True, height_ratios=[3, 1])
 ax1.scatter(x,y, s=8, color='#0096FF')
 ax1.axline((0, 0), slope=1, color='k')
 ax1.set_ylabel('Predicted Match')
