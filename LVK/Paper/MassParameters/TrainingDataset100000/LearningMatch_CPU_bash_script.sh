@@ -19,5 +19,5 @@ source activate /users/sgreen/.conda/envs/PyCBCandPytorch2
 echo `conda info`
 echo `which python`
 
-cd /users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/ComparisonLossCurve/
-python MassSpinLossCurves.py
+cd /users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset100000/
+python Datasets.py

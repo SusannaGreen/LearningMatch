@@ -41,7 +41,7 @@ STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = DATA_DIR+'TrainingValidationLoss.csv'
+LOSS = DATA_DIR+'100000TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
 EPOCHS = 1000
@@ -62,10 +62,6 @@ logging.info(f'The data size of the training and validation dataset is {len(Trai
 scaler = preprocessing.StandardScaler()
 TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.fit_transform(TrainingBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
 ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
-scaler_mean = scaler.mean_
-scaler_std = scaler.var_
-logging.info(f'IMPORTANT: The mean of the standard scaler is {scaler_mean}')
-logging.info(f'IMPORTANT: The standard deviation of the standard scaler is {scaler_std}')
 
 #Splitting into input (i.e. the template parameters) and output (the match)
 x_train = np.vstack((TrainingBank.ref_mass1.values, TrainingBank.ref_mass2.values, 

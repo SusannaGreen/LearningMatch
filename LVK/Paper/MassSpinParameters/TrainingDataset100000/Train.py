@@ -41,11 +41,11 @@ STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = DATA_DIR+'TrainingValidationLoss.csv'
+LOSS = DATA_DIR+'100000TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
-EPOCHS = 500
-BATCH_SIZE = 16
+EPOCHS = 1000
+BATCH_SIZE = 64
 LEARNING_RATE = 1e-5
 
 #Check that Pytorch recognises there is a GPU available

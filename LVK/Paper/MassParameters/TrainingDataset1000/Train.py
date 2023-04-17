@@ -41,7 +41,7 @@ STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = DATA_DIR+'TrainingValidationLoss.csv'
+LOSS = DATA_DIR+'1000TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
 EPOCHS = 1000

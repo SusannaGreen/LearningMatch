@@ -24,12 +24,12 @@ DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDat
 #Define the the training, validation and test dataset
 TRAINING_DATASET_FILE = DATA_DIR+'1000000MassSpinTrainingDataset.csv'
 VALIDATION_DATASET_FILE = DATA_DIR+'10000MassSpinValidationDataset.csv'
-TEST_DATASET_FILE = DATA_DIR+'1000MassSpinTestBankDataset.csv'
+TEST_DATASET_FILE = DATA_DIR+'5000MassSpinTestBankDataset.csv'
 
 #Define the size of the training, validation and test dataset
-TRAINING_SIZE = 1000 #size of the training dataset
-VALIDATION_SIZE = 100 #size of the validation dataset
-TEST_SIZE = 100 #size of the test dataset
+TRAINING_SIZE = 1000000 #size of the training dataset
+VALIDATION_SIZE = 100000 #size of the validation dataset
+TEST_SIZE = 5000 #size of the test dataset
 
 #Define the detector
 LOW_FREQ = 12 #frequency cut-off for the GW detector

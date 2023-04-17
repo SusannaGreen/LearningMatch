@@ -21,4 +21,4 @@ echo `conda info`
 echo `which python`
 
 cd /users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/
-python Train.py
+python Plots.py

@@ -36,7 +36,7 @@ logger.addHandler(file_handler) # add file handler to logger
 DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/'
 
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassTestDataset.csv'
+TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassSpinTestDataset.csv'
 
 #Define location of the scaling
 SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
@@ -45,7 +45,12 @@ SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'1000000TrainingValidationLoss.csv'
+
+#Defining the location of the outputs
+LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve.pdf'
+ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError.pdf'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted.pdf'
 
 #Define the functions
 def to_cpu_np(x):
@@ -100,13 +105,13 @@ Loss = pd.read_csv(LOSS_FILE)
 validation_loss = Loss.validation_loss.values
 training_loss = Loss.training_loss.values
 
-plt.figure(figsize=(8.2, 6.2))
+plt.figure(figsize=(9, 9))
 plt.semilogy(np.arange(1, len(training_loss)+1), training_loss, color='#5B2C6F', label='Training Loss')
 plt.semilogy(np.arange(1, len(validation_loss)+1), validation_loss, color='#0096FF', label='Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig(LOSS_CURVE)
+plt.savefig(LOSS_CURVE, dpi=300, bbox_inches='tight')
 
 #Creates a plot that compares the actual match values with LearningMatch's predicted match values 
 logger.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
@@ -114,7 +119,7 @@ logger.info("Creating a plot that compares tha actual match values with predicte
 x = to_cpu_np(y_test)
 y = to_cpu_np(y_prediction[:, 0])
 
-fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 7), sharex=True, height_ratios=[3, 1])
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 9), sharex=True, height_ratios=[3, 1])
 ax1.scatter(x,y, s=8, color='#0096FF')
 ax1.axline((0, 0), slope=1, color='k')
 ax1.set_ylabel('Predicted Match')
@@ -123,21 +128,21 @@ sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'line
 ax2.set_ylabel('Error')
 
 fig.supxlabel('Actual Match')
-plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300)
+plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300, bbox_inches='tight')
 
 #Creates a histogram of the errors
 logger.info("Creating a histogram of the errors") 
 
 error = to_cpu_np(y_prediction[:, 0] - y_test)
 
-plt.figure(figsize=(9, 7))
+plt.figure(figsize=(9, 9))
 plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
 plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
 plt.xlim([error.min(), error.max()])
-plt.xticks([-0.1, -0.05, -0.01, 0.01, 0.05, 0.1])
+plt.xticks([-0.05, -0.01, 0.01, 0.05])
 plt.yscale('log')
 plt.xlabel('Error')
 plt.ylabel('Count')
 plt.legend(loc='upper left')
-plt.savefig(ERROR_HISTOGRAM, dpi=300)
+plt.savefig(ERROR_HISTOGRAM, dpi=300, bbox_inches='tight')
 

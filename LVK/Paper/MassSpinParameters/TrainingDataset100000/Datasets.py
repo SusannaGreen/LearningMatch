@@ -23,12 +23,12 @@ DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDat
 
 #Define the the training, validation and test dataset
 TRAINING_DATASET_FILE = DATA_DIR+'100000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = DATA_DIR+'5000MassSpinValidationDataset.csv'
+VALIDATION_DATASET_FILE = DATA_DIR+'10000MassSpinValidationDataset.csv'
 TEST_DATASET_FILE = DATA_DIR+'5000MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
 TRAINING_SIZE = 100000 #size of the training dataset
-VALIDATION_SIZE = 5000 #size of the validation dataset
+VALIDATION_SIZE = 10000 #size of the validation dataset
 TEST_SIZE = 5000 #size of the test dataset
 
 #Define the detector

@@ -48,9 +48,9 @@ LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = DATA_DIR+'LossCurve.pdf'
-ERROR_HISTOGRAM = DATA_DIR+'Error.pdf'
-ACTUAL_PREDICTED_PLOT = DATA_DIR+'ActualPredicted.pdf'
+LOSS_CURVE = DATA_DIR+'100000LossCurve.pdf'
+ERROR_HISTOGRAM = DATA_DIR+'100000Error.pdf'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'100000ActualPredicted.pdf'
 
 #Define the functions
 def to_cpu_np(x):
@@ -103,21 +103,21 @@ Loss = pd.read_csv(LOSS_FILE)
 validation_loss = Loss.validation_loss.values
 training_loss = Loss.training_loss.values
 
-plt.figure(figsize=(8.2, 6.2))
+plt.figure(figsize=(9, 9))
 plt.semilogy(np.arange(1, len(training_loss)+1), training_loss, color='#5B2C6F', label='Training Loss')
 plt.semilogy(np.arange(1, len(validation_loss)+1), validation_loss, color='#0096FF', label='Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend()
-plt.savefig(LOSS_CURVE)
+plt.savefig(LOSS_CURVE, dpi=300, bbox_inches='tight')
 
 #Creates a plot that compares the actual match values with LearningMatch's predicted match values 
-logging.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
+logger.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
 
 x = to_cpu_np(y_test)
 y = to_cpu_np(y_prediction[:, 0])
 
-fig, (ax1, ax2) = plt.subplots(2, figsize=(6, 10), sharex=True, height_ratios=[3, 1])
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 9), sharex=True, height_ratios=[3, 1])
 ax1.scatter(x,y, s=8, color='#0096FF')
 ax1.axline((0, 0), slope=1, color='k')
 ax1.set_ylabel('Predicted Match')
@@ -126,14 +126,14 @@ sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'line
 ax2.set_ylabel('Error')
 
 fig.supxlabel('Actual Match')
-plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300)
+plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300, bbox_inches='tight')
 
 #Creates a histogram of the errors
-logging.info("Creating a histogram of the errors") 
+logger.info("Creating a histogram of the errors") 
 
 error = to_cpu_np(y_prediction[:, 0] - y_test)
 
-plt.figure(figsize=(9, 7))
+plt.figure(figsize=(9, 9))
 plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
 plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
 plt.xlim([error.min(), error.max()])
@@ -142,5 +142,5 @@ plt.yscale('log')
 plt.xlabel('Error')
 plt.ylabel('Count')
 plt.legend(loc='upper left')
-plt.savefig(ERROR_HISTOGRAM, dpi=300)
+plt.savefig(ERROR_HISTOGRAM, dpi=300, bbox_inches='tight')
 
