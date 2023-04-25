@@ -45,7 +45,7 @@ SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'10000TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
 LOSS_CURVE = DATA_DIR+'10000LossCurve.pdf'

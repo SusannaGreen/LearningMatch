@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # define file handler and set formatter
-file_handler = logging.FileHandler('logfile.log')
+file_handler = logging.FileHandler('LossCurve.log')
 formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 file_handler.setFormatter(formatter)
 
@@ -42,7 +42,7 @@ validation_loss_3 = training_validation_loss_3.validation_loss.values
 
 
 #Plots the loss curve for training and validation data set
-plt.figure(figsize=(8.2, 6.2))
+plt.figure(figsize=(9, 9))
 plt.semilogy(np.arange(1, len(training_loss_1)+1), training_loss_1, color='#5B2C6F', label='10000 Training Loss')
 plt.semilogy(np.arange(1, len(validation_loss_1)+1), validation_loss_1, color='#0096FF', label='10000 Validation Loss')
 plt.semilogy(np.arange(1, len(training_loss_2)+1), training_loss_2, color='#5B2C6F', label='100000 Training Loss')
@@ -52,4 +52,4 @@ plt.semilogy(np.arange(1, len(validation_loss_3)+1), validation_loss_3, color='#
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend(fontsize="small")
-plt.savefig('mass_loss_curve.pdf')
+plt.savefig('MassLossCurve.pdf', dpi=300, bbox_inches='tight')

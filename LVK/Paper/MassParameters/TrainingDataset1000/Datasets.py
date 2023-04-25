@@ -10,6 +10,9 @@ from pycbc.filter import matchedfilter
 from pycbc.psd.analytical import aLIGO175MpcT1800545
 from pycbc.waveform import get_fd_waveform, get_td_waveform
 
+#from joblib import Parallel, delayed
+#results = Parallel(n_jobs=12, verbose=10)(delayed(process)(*arg) for arg in simlst)
+
 #Set-up the logging 
 logger = logging.getLogger(__name__)  
 logger.setLevel(logging.INFO) # set log level 

@@ -26,7 +26,7 @@ matplotlib.rcParams['font.family'] = 'STIXGeneral'
 logger = logging.getLogger(__name__)  
 logger.setLevel(logging.INFO) # set log level 
 
-file_handler = logging.FileHandler('logfile.log') # define file handler and set formatter
+file_handler = logging.FileHandler('Plots.log') # define file handler and set formatter
 formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 file_handler.setFormatter(formatter)
 
@@ -45,7 +45,7 @@ SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
 LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 
 #Define location of the loss File
-LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'100000TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
 LOSS_CURVE = DATA_DIR+'100000LossCurve.pdf'

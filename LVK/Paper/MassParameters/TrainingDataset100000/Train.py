@@ -21,7 +21,7 @@ from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 logger = logging.getLogger(__name__)  
 logger.setLevel(logging.INFO) # set log level 
 
-file_handler = logging.FileHandler('logfile.log') # define file handler and set formatter
+file_handler = logging.FileHandler('Train.log') # define file handler and set formatter
 formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 file_handler.setFormatter(formatter)
 
@@ -44,9 +44,9 @@ LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 LOSS = DATA_DIR+'100000TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
-EPOCHS = 1000
+EPOCHS = 400
 BATCH_SIZE = 16
-LEARNING_RATE = 1e-5
+LEARNING_RATE = 1e-4
 
 #Check that Pytorch recognises there is a GPU available
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -92,6 +92,7 @@ our_model = NeuralNetwork().to(device)
 criterion = torch.nn.MSELoss(reduction='sum') # return the sum so we can calculate the mse of the epoch.
 optimizer = torch.optim.Adam(our_model.parameters(), lr = LEARNING_RATE)
 scheduler = ReduceLROnPlateau(optimizer, 'min')
+compiled_model = torch.compile(our_model)
 logging.info("Model successfully loaded")
 
 loss_list = []
@@ -114,7 +115,7 @@ for epoch in range(EPOCHS):
         optimizer.zero_grad()
 
         # Make predictions for this batch
-        outputs = our_model(inputs)
+        outputs = compiled_model(inputs)
 
         # Compute the loss and its gradients
         loss = criterion(outputs, labels)
@@ -138,7 +139,7 @@ for epoch in range(EPOCHS):
         vinputs, vlabels = vdata
         vinputs = vinputs.view(vinputs.size(0), -1)
         vlabels = vlabels.view(vlabels.size(0), -1)
-        voutputs = our_model(vinputs)
+        voutputs = compiled_model(vinputs)
         vloss = criterion(voutputs, vlabels)
 
         del voutputs
