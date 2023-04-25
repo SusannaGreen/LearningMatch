@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1g.5gb:1
-#SBATCH --job-name=MassSpinNN
+#SBATCH --job-name=LearningMatch
 #SBATCH --ntasks=16
 #SBATCH --time=72:00:00
 #SBATCH --output=output_logfile%j
@@ -15,10 +15,10 @@ module purge
 module load system
 module load anaconda3/2022.10
 
-source activate /users/sgreen/.conda/envs/PyCBCandPytorch2
+source activate /mnt/lustre/shared_conda/envs/sgreen/PyCBCandPytorch2
 
 echo `conda info`
 echo `which python`
 
 cd /users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/
-python Plots.py
+python Train.py

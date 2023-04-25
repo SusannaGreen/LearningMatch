@@ -68,13 +68,13 @@ def dataset_generation(size_of_dataset, output_of_dataset):
         template.resize(len(PSD))
         match, Index = template.match(template_reference, psd=PSD, low_frequency_cutoff=15)
         match_time.append(time.time()-template_generation)
-        parameters_list.append([ref_m1, ref_m2, m1, m2, ref_s1, ref_s2, s1, s2, match])
+        parameters_list.append([ref_m1, ref_m2, ref_s1, ref_s2, m1, m2, s1, s2, match])
     
     logger.info("Time taken to generate this dataset %s", time.time() - start_time)
     logger.info("Total time taken to calculate the match %s", sum(match_time))
     logger.info("The average time taken to calculate the match %s", sum(match_time)/len(match_time))
 
-    MassSpinMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2', 'match'])
+    MassSpinMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'ref_spin1', 'ref_spin2', 'mass1', 'mass2', 'spin1', 'spin2', 'match'])
     MassSpinMatchDataset.to_csv(output_of_dataset, index = False)
 
 #Generate the training, validation and test dataset

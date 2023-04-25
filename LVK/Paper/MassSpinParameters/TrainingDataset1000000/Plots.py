@@ -48,9 +48,9 @@ LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 LOSS_FILE = DATA_DIR+ r'1000000TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve.pdf'
-ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError.pdf'
-ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted.pdf'
+LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve.png'
+ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError.png'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted.png'
 
 #Define the functions
 def to_cpu_np(x):

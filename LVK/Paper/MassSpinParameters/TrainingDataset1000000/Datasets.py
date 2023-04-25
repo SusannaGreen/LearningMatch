@@ -18,13 +18,15 @@ file_handler = logging.FileHandler('Datasets.log') # define file handler and set
 formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 file_handler.setFormatter(formatter)
 
+logger.addHandler(file_handler) # add file handler to logger
+
 #Define directory for the output
 DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/'
 
 #Define the the training, validation and test dataset
 TRAINING_DATASET_FILE = DATA_DIR+'1000000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = DATA_DIR+'10000MassSpinValidationDataset.csv'
-TEST_DATASET_FILE = DATA_DIR+'5000MassSpinTestBankDataset.csv'
+VALIDATION_DATASET_FILE = DATA_DIR+'100000MassSpinValidationDataset.csv'
+TEST_DATASET_FILE = DATA_DIR+'5000MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
 TRAINING_SIZE = 1000000 #size of the training dataset
@@ -66,19 +68,19 @@ def dataset_generation(size_of_dataset, output_of_dataset):
         template.resize(len(PSD))
         match, Index = template.match(template_reference, psd=PSD, low_frequency_cutoff=15)
         match_time.append(time.time()-template_generation)
-        parameters_list.append([ref_m1, ref_m2, m1, m2, ref_s1, ref_s2, s1, s2, match])
+        parameters_list.append([ref_m1, ref_m2, ref_s1, ref_s2, m1, m2, s1, s2, match])
     
     logger.info("Time taken to generate this dataset %s", time.time() - start_time)
     logger.info("Total time taken to calculate the match %s", sum(match_time))
     logger.info("The average time taken to calculate the match %s", sum(match_time)/len(match_time))
 
-    MassSpinMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'mass1', 'mass2', 'ref_spin1', 'ref_spin2', 'spin1', 'spin2', 'match'])
+    MassSpinMatchDataset =  pd.DataFrame(data=(parameters_list), columns=['ref_mass1', 'ref_mass2', 'ref_spin1', 'ref_spin2', 'mass1', 'mass2', 'spin1', 'spin2', 'match'])
     MassSpinMatchDataset.to_csv(output_of_dataset, index = False)
 
 #Generate the training, validation and test dataset
-logging.info("Creating the training dataset")
+logger.info("Creating the training dataset")
 dataset_generation(TRAINING_SIZE, TRAINING_DATASET_FILE)
-logging.info("Creating the validation dataset")
+logger.info("Creating the validation dataset")
 dataset_generation(VALIDATION_SIZE, VALIDATION_DATASET_FILE)
-logging.info("Creating the test dataset")
+logger.info("Creating the test dataset")
 dataset_generation(TEST_SIZE, TEST_DATASET_FILE)
