@@ -44,7 +44,7 @@ LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
 LOSS = DATA_DIR+'1000TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
-EPOCHS = 400
+EPOCHS = 250
 BATCH_SIZE = 16
 LEARNING_RATE = 1e-4
 
@@ -95,12 +95,14 @@ scheduler = ReduceLROnPlateau(optimizer, 'min')
 compiled_model = torch.compile(our_model)
 logger.info("Model successfully loaded")
 
+start_time = time.time()
+
 loss_list = []
 
 epoch_number = 0
 for epoch in range(EPOCHS):
     # Make sure gradient tracking is on, and do a pass over the data
-    our_model.train(True)
+    compiled_model.train(True)
 
     iters  = []
     epoch_loss = 0.
@@ -133,7 +135,7 @@ for epoch in range(EPOCHS):
         del batch_mse
         epoch_loss += float(loss) #added float to address the memory issues
     
-    our_model.train(False)
+    compiled_model.train(False)
 
     for i, vdata in enumerate(validation_loader):
         vinputs, vlabels = vdata
@@ -169,6 +171,8 @@ for epoch in range(EPOCHS):
 
     del epoch_mse
     del vepoch_mse
+
+logger.info("Time taken to train LearningMatch %s", time.time() - start_time)
 
 #Creates a file with the training and validation loss
 loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy() #Gets the list off the GPU and into a numpy array

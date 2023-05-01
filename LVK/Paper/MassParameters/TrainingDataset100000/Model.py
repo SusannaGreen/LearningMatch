@@ -12,10 +12,10 @@ OUTPUT = 1 #Number of outputs
 class NeuralNetwork(torch.nn.Module):
     def __init__(self):
         super(NeuralNetwork, self).__init__()
-        self.linear0 = torch.nn.Linear(INPUT, 175)
-        self.linear1 = torch.nn.Linear(175, 97)
-        self.linear2 = torch.nn.Linear(97, 46)
-        self.linear_out = torch.nn.Linear(46, OUTPUT)
+        self.linear0 = torch.nn.Linear(INPUT, 200)
+        self.linear1 = torch.nn.Linear(200, 122)
+        self.linear2 = torch.nn.Linear(122, 71)
+        self.linear_out = torch.nn.Linear(71, OUTPUT)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = torch.nn.functional.relu(self.linear0(x))

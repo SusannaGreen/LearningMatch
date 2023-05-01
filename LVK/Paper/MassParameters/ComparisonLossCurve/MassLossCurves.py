@@ -52,4 +52,4 @@ plt.semilogy(np.arange(1, len(validation_loss_3)+1), validation_loss_3, color='#
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.legend(fontsize="small")
-plt.savefig('MassLossCurve.pdf', dpi=300, bbox_inches='tight')
+plt.savefig('MassLossCurve.png', dpi=300, bbox_inches='tight')
