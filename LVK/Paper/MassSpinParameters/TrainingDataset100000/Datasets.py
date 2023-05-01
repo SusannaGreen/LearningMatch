@@ -7,8 +7,8 @@ import time
 import logging 
 
 from pycbc.filter import matchedfilter
-from pycbc.psd.analytical import aLIGO175MpcT1800545
-from pycbc.waveform import get_fd_waveform, get_td_waveform
+from pycbc.psd.analytical import aLIGO140MpcT1800545
+from pycbc.waveform import get_fd_waveform
 
 #Set-up the logging 
 logger = logging.getLogger(__name__)  
@@ -38,7 +38,7 @@ LOW_FREQ = 12 #frequency cut-off for the GW detector
 SAMPLE_RATE = 4096 #sampling rate of desired detector
 TLEN = 128
 DELTA_F = 1.0 / TLEN
-PSD = aLIGO175MpcT1800545(1+TLEN*SAMPLE_RATE//2, delta_f=DELTA_F, low_freq_cutoff=LOW_FREQ) 
+PSD = aLIGO140MpcT1800545(1+TLEN*SAMPLE_RATE//2, delta_f=DELTA_F, low_freq_cutoff=LOW_FREQ) 
 
 #Define the template you want LearningMatch to learn
 TEMPLATE = 'IMRPhenomXAS'

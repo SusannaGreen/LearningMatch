@@ -87,6 +87,8 @@ model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(LEARNINGMATCH_MODEL, map_location=device))
 model.eval()
 
+compiled_model = torch.compile(model)
+
 #Time taken to predict the match on the test dataset
 logger.info("LearningMatch is predicting the Match for your dataset")  
 with torch.no_grad():

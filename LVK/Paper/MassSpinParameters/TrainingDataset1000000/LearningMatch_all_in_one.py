@@ -10,38 +10,45 @@ import time
 import logging
 
 from sklearn import preprocessing
-from joblib import dump
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau
 
+import seaborn as sns
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.rcParams.update({'font.size': 20})
+matplotlib.rcParams['mathtext.fontset'] = 'stix'
+matplotlib.rcParams['font.family'] = 'STIXGeneral'
+
 #Set-up the logging 
 logger = logging.getLogger(__name__)  
 logger.setLevel(logging.INFO) # set log level 
 
-file_handler = logging.FileHandler('Train.log') # define file handler and set formatter
+file_handler = logging.FileHandler('AllInOne.log') # define file handler and set formatter
 formatter    = logging.Formatter('%(asctime)s : %(levelname)s : %(name)s : %(message)s')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler) # add file handler to logger
 
+#Define the functions
+def to_cpu_np(x):
+    return x.cpu().detach().numpy()
+
 #Define directory of the input and output files 
-DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset100000/'
+DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/'
 
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = DATA_DIR+r'100000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'10000MassSpinValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = DATA_DIR+r'1000000MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'100000MassSpinValidationDataset.csv'
+TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassSpinTestDataset.csv'
 
-#Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = DATA_DIR+'StandardScaler.bin'
-
-#Define output location of the LearningMatch model
-LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'
-
-#Define output location for the training and validation loss
-LOSS = DATA_DIR+'100000TrainingValidationLoss.csv'
+#Defining the location of the outputs
+LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve.png'
+ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError.png'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted.png'
 
 #Define values for the LearningMatch model
 EPOCHS = 250
@@ -102,6 +109,7 @@ logger.info("Model successfully loaded")
 start_time = time.time()
 
 loss_list = []
+val_list = []
 
 epoch_number = 0
 for epoch in range(EPOCHS):
@@ -169,7 +177,8 @@ for epoch in range(EPOCHS):
     scheduler.step(vepoch_mse)
 
     #Create a loss_curve
-    loss_list.append([epoch_mse, vepoch_mse])
+    loss_list.append(epoch_mse)
+    val_list.append(vepoch_mse)
 
     epoch_number += 1
 
@@ -178,15 +187,87 @@ for epoch in range(EPOCHS):
 
 logger.info("Time taken to train LearningMatch %s", time.time() - start_time)
 
-#Creates a file with the training and validation loss
-loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy() #Gets the list off the GPU and into a numpy array
-MassSpinMatchDataset =  pd.DataFrame(data=(loss_array), columns=['training_loss', 'validation_loss'])
-MassSpinMatchDataset.to_csv(LOSS, index = False)
+#Check that Pytorch recognises there is a GPU available
+device = "cuda" if torch.cuda.is_available() else "cpu"
+logger.info(f"Using {device} device")    
 
-#Save the trained LearningMatch model 
-torch.save(our_model.state_dict(), LEARNINGMATCH_MODEL)
+#Reading the test dataset
+logger.info("Reading in the test dataset")
+test_dataset = pd.read_csv(TEST_DATASET_FILE_PATH)
+logger.info(f'The size of the test dataset is {len(test_dataset)}')
 
-#Save the StandardScaler.()
-dump(scaler, STANDARD_SCALER, compress=True)
+#Scaling the test dataset
+logger.info("Scaling the test dataset")
+test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']])
+
+#Convert to a Tensor
+logger.info("Converting the test dataset into a tensor")
+x_test = np.vstack((test_dataset.ref_mass1.values, test_dataset.ref_mass2.values, 
+test_dataset.mass1.values, test_dataset.mass2.values,
+test_dataset.ref_spin1.values, test_dataset.ref_spin2.values,
+test_dataset.spin1.values, test_dataset.spin2.values)).T
+y_test = test_dataset.match.values
+
+x_test = torch.tensor(x_test, dtype=torch.float32, device='cuda')
+y_test = torch.tensor(y_test, dtype=torch.float32, device='cuda')
+
+#Time taken to predict the match on the test dataset
+logger.info("LearningMatch is predicting the Match for your dataset")  
+with torch.no_grad():
+    pred_start_time = time.time()
+    y_prediction = compiled_model(x_test) 
+    torch.cuda.synchronize()
+    end_time = time.time()
+
+logger.info(("Total time taken", end_time - pred_start_time))
+logger.info(("Average time taken to predict the match", (end_time - pred_start_time)/len(x_test)))
+
+#Plots the loss curve for training and validation data set
+logger.info("Creating a loss curve which compares the training loss with validation loss")  
+
+#A really complicated way of getting the list off the GPU and into a numpy array
+loss_array = torch.tensor(loss_list, dtype=torch.float32, device='cpu').detach().numpy()
+val_loss_array = torch.tensor(val_list, dtype=torch.float32, device='cpu').detach().numpy()
+
+plt.figure(figsize=(9, 9))
+plt.semilogy(np.arange(1, len(loss_array)+1), loss_array, color='#5B2C6F', label='Training Loss')
+plt.semilogy(np.arange(1, len(val_loss_array)+1), val_loss_array, color='#0096FF', label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.savefig(LOSS_CURVE, dpi=300, bbox_inches='tight')
+
+#Creates a plot that compares the actual match values with LearningMatch's predicted match values 
+logger.info("Creating a plot that compares tha actual match values with predicted match values, with residuals")  
+
+x = to_cpu_np(y_test)
+y = to_cpu_np(y_prediction[:, 0])
+
+fig, (ax1, ax2) = plt.subplots(2, figsize=(9, 9), sharex=True, height_ratios=[3, 1])
+ax1.scatter(x,y, s=8, color='#0096FF')
+ax1.axline((0, 0), slope=1, color='k')
+ax1.set_ylabel('Predicted Match')
+
+sns.residplot(x=x, y=y, color = '#0096FF', scatter_kws={'s': 8}, line_kws={'linewidth':20})
+ax2.set_ylabel('Error')
+
+fig.supxlabel('Actual Match')
+plt.savefig(ACTUAL_PREDICTED_PLOT, dpi=300, bbox_inches='tight')
+
+#Creates a histogram of the errors
+logger.info("Creating a histogram of the errors") 
+
+error = to_cpu_np(y_prediction[:, 0] - y_test)
+
+plt.figure(figsize=(9, 9))
+plt.hist(error, bins=30, range=[error.min(), error.max()], color='#5B2C6F', align='mid', label='Errors for all match values')
+plt.hist(error[x > .95], bins=30, range=[error.min(), error.max()], color='#0096FF', align='mid', label='Errors for match values over 0.95')
+plt.xlim([error.min(), error.max()])
+plt.xticks([-0.05, -0.01, 0.01, 0.05])
+plt.yscale('log')
+plt.xlabel('Error')
+plt.ylabel('Count')
+plt.legend(loc='upper left')
+plt.savefig(ERROR_HISTOGRAM, dpi=300, bbox_inches='tight')
 
 

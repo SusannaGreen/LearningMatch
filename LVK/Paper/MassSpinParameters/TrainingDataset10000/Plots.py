@@ -48,9 +48,9 @@ LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
 LOSS_FILE = DATA_DIR+ r'10000TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = DATA_DIR+'10000MassSpinLossCurve.pdf'
-ERROR_HISTOGRAM = DATA_DIR+'10000MassSpinError.pdf'
-ACTUAL_PREDICTED_PLOT = DATA_DIR+'10000MassSpinActualPredicted.pdf'
+LOSS_CURVE = DATA_DIR+'10000MassSpinLossCurve.png'
+ERROR_HISTOGRAM = DATA_DIR+'10000MassSpinError.png'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'10000MassSpinActualPredicted.png'
 
 #Define the functions
 def to_cpu_np(x):
@@ -87,11 +87,13 @@ model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(LEARNINGMATCH_MODEL, map_location=device))
 model.eval()
 
+compiled_model = torch.compile(model)
+
 #Time taken to predict the match on the test dataset
 logger.info("LearningMatch is predicting the Match for your dataset")  
 with torch.no_grad():
     pred_start_time = time.time()
-    y_prediction = model(x_test) 
+    y_prediction = compiled_model(x_test) 
     torch.cuda.synchronize()
     end_time = time.time()
 
