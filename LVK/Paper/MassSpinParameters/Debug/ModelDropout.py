@@ -18,10 +18,16 @@ class NeuralNetwork(torch.nn.Module):
         self.linear3 = torch.nn.Linear(341, 176)
         self.linear_out = torch.nn.Linear(176, OUTPUT)
 
+        # Define proportion or neurons to dropout
+        self.dropout = nn.Dropout(0.25)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = torch.nn.functional.relu(self.linear0(x))
+        x = self.dropout(x)
         x = torch.nn.functional.relu(self.linear1(x))
+        x = self.dropout(x)
         x = torch.nn.functional.relu(self.linear2(x))
+        x = self.dropout(x)
         x = torch.sigmoid(self.linear3(x))
         x = self.linear_out(x)
         return x

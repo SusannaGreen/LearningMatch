@@ -6,7 +6,7 @@ import pandas as pd
 import time
 import logging 
 
-from pycbc.filter import matchedfilter
+from pycbc.filter import match as pycbc_match
 from pycbc.psd.analytical import aLIGO140MpcT1800545
 from pycbc.waveform import get_fd_waveform
 
@@ -27,9 +27,9 @@ logger.addHandler(file_handler) # add file handler to logger
 DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassParameters/TrainingDataset1000/'
 
 #Define name of the output files
-TRAINING_DATASET_FILE = DATA_DIR+'1000MassTrainingDataset.csv'
-VALIDATION_DATASET_FILE = DATA_DIR+'100MassValidationDataset.csv'
-TEST_DATASET_FILE = DATA_DIR+'5000MassTestDataset.csv'
+TRAINING_DATASET_FILE = DATA_DIR+'New1000MassTrainingDataset.csv'
+VALIDATION_DATASET_FILE = DATA_DIR+'New100MassValidationDataset.csv'
+TEST_DATASET_FILE = DATA_DIR+'New5000MassTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
 TRAINING_SIZE = 1000 #size of the training dataset
@@ -65,7 +65,7 @@ def dataset_generation(size_of_dataset, output_of_dataset):
         template, _ = get_fd_waveform(approximant=TEMPLATE, mass1=m1, mass2=m2, delta_f=DELTA_F, f_lower=LOW_FREQ)
         template_reference.resize(len(PSD))
         template.resize(len(PSD))
-        match, Index = template.match(template_reference, psd=PSD, low_frequency_cutoff=15)
+        match, Index = pycbc_match(template_reference, template, psd=PSD, low_frequency_cutoff=18)
         match_time.append(time.time()-template_generation)
         parameters_list.append([ref_m1, ref_m2, m1, m2, match])
 
