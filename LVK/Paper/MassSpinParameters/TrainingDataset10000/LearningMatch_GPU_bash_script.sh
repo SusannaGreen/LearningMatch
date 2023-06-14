@@ -15,10 +15,10 @@ module purge
 module load system
 module load anaconda3/2022.10
 
-source activate /mnt/lustre/shared_conda/envs/sgreen/PyCBCandPytorch2
+source activate /mnt/lustre/shared_conda/envs/sgreen/NewPyCBCandPytorch2
 
 echo `conda info`
 echo `which python`
 
 cd /users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset10000/
-python Plots.py
+python Train.py

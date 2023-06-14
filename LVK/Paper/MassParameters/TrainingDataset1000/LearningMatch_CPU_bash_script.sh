@@ -14,7 +14,7 @@ module purge
 module load system
 module load anaconda3/2022.10
 
-source activate /mnt/lustre/shared_conda/envs/sgreen/PyCBCandPytorch2
+source activate /mnt/lustre/shared_conda/envs/sgreen/PyCBCandOptuna
 
 echo `conda info`
 echo `which python`

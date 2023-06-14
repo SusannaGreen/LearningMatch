@@ -72,10 +72,10 @@ test_dataset[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(te
 
 #Convert to a Tensor
 logger.info("Converting the test dataset into a tensor")
-x_test = np.vstack((test_dataset.ref_mass1.values, test_dataset.ref_mass2.values, 
-test_dataset.mass1.values, test_dataset.mass2.values,
-test_dataset.ref_spin1.values, test_dataset.ref_spin2.values,
-test_dataset.spin1.values, test_dataset.spin2.values)).T
+x_test = np.vstack((test_dataset.ref_mass1.values, test_dataset.ref_mass2.values,
+                    test_dataset.ref_spin1.values, test_dataset.ref_spin2.values, 
+                    test_dataset.mass1.values, test_dataset.mass2.values,
+                    test_dataset.spin1.values, test_dataset.spin2.values)).T
 y_test = test_dataset.match.values
 
 x_test = torch.tensor(x_test, dtype=torch.float32, device='cuda')

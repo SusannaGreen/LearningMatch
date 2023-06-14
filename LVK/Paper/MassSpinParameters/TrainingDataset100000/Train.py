@@ -65,15 +65,15 @@ ValidationBank[['ref_mass1', 'ref_mass2', 'mass1', 'mass2']] = scaler.transform(
 
 #Splitting into input (i.e. the template parameters) and output (the match)
 x_train = np.vstack((TrainingBank.ref_mass1.values, TrainingBank.ref_mass2.values, 
-TrainingBank.mass1.values, TrainingBank.mass2.values,
-TrainingBank.ref_spin1.values, TrainingBank.ref_spin2.values,
-TrainingBank.spin1.values, TrainingBank.spin2.values)).T
+                     TrainingBank.ref_spin1.values, TrainingBank.ref_spin2.values, 
+                     TrainingBank.mass1.values, TrainingBank.mass2.values,
+                     TrainingBank.spin1.values, TrainingBank.spin2.values)).T
 y_train = TrainingBank.match.values
 
-x_val = np.vstack((ValidationBank.ref_mass1.values, ValidationBank.ref_mass2.values, 
-ValidationBank.mass1.values, ValidationBank.mass2.values,
-ValidationBank.ref_spin1.values, ValidationBank.ref_spin2.values,
-ValidationBank.spin1.values, ValidationBank.spin2.values)).T
+x_val = np.vstack((ValidationBank.ref_mass1.values, ValidationBank.ref_mass2.values,
+                   ValidationBank.ref_spin1.values, ValidationBank.ref_spin2.values, 
+                   ValidationBank.mass1.values, ValidationBank.mass2.values,
+                   ValidationBank.spin1.values, ValidationBank.spin2.values)).T
 y_val = ValidationBank.match.values
 
 #Convert a numpy array to a Tensor
