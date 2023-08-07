@@ -39,18 +39,18 @@ DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDat
 TEST_DATASET_FILE_PATH = DATA_DIR+r'5000MassSpinTestDataset.csv'
 
 #Define location of the scaling
-SCALER_FILE_PATH = DATA_DIR+'StandardScaler.bin'
+SCALER_FILE_PATH = DATA_DIR+'1000000StandardScaler32.bin'
 
 #Define location of the trained LearningMatch model 
-LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
+LEARNINGMATCH_MODEL =  DATA_DIR+'1000000LearningMatchModel32.pth'
 
 #Define location of the loss File
-LOSS_FILE = DATA_DIR+ r'1000000TrainingValidationLoss.csv'
+LOSS_FILE = DATA_DIR+ r'1000000TrainingValidationLoss32.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve1.png'
-ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError1.png'
-ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted1.png'
+LOSS_CURVE = DATA_DIR+'1000000MassSpinLossCurve32.png'
+ERROR_HISTOGRAM = DATA_DIR+'1000000MassSpinError32.png'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+'1000000MassSpinActualPredicted32.png'
 
 #Define the functions
 def to_cpu_np(x):

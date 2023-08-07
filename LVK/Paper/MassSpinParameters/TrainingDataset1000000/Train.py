@@ -32,21 +32,21 @@ logger.addHandler(file_handler) # add file handler to logger
 DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/'
 
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = DATA_DIR+r'1000000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'100000MassSpinValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = DATA_DIR+r'2000000Exponential20MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'200000Exponential20MassSpinValidationDataset.csv'
 
 #Define ouput location of the Standard.Scaler()
-STANDARD_SCALER = DATA_DIR+'StandardScaler2.bin'
+STANDARD_SCALER = DATA_DIR+'2000000Exponential20StandardScaler.bin'
 
 #Define output location of the LearningMatch model
-LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel2.pth'
+LEARNINGMATCH_MODEL = DATA_DIR+'2000000Exponential20LearningMatchModel.pth'
 
 #Define output location for the training and validation loss
-LOSS = DATA_DIR+'1000000TrainingValidationLoss2.csv'
+LOSS = DATA_DIR+'2000000Exponential20TrainingValidationLoss.csv'
 
 #Define values for the LearningMatch model
 EPOCHS = 250
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
 
 #Check that Pytorch recognises there is a GPU available

@@ -4,7 +4,7 @@ import time
 
 from pycbc.filter import matchedfilter
 from pycbc.psd.analytical import aLIGOaLIGO175MpcT1800545
-from pycbc.waveform import get_fd_waveform, get_td_waveform
+from pycbc.waveform import get_fd_waveform
 
 SIZE = 100000 #size of the desired template bank 
 LOW_FREQ = 12

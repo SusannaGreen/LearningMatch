@@ -24,14 +24,14 @@ logger.addHandler(file_handler) # add file handler to logger
 DATA_DIR = '/users/sgreen/LearningMatch/LVK/Paper/MassSpinParameters/TrainingDataset1000000/'
 
 #Define the the training, validation and test dataset
-TRAINING_DATASET_FILE = DATA_DIR+'New1000000MassSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE = DATA_DIR+'New100000MassSpinValidationDataset.csv'
-TEST_DATASET_FILE = DATA_DIR+'New5000MassSpinTestDataset.csv'
+TRAINING_DATASET_FILE = DATA_DIR+'2000000Exponential20MassSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE = DATA_DIR+'200000Exponential20MassSpinValidationDataset.csv'
+TEST_DATASET_FILE = DATA_DIR+'10000Exponential20MassSpinTestDataset.csv'
 
 #Define the size of the training, validation and test dataset
-TRAINING_SIZE = 1000000 #size of the training dataset
-VALIDATION_SIZE = 100000 #size of the validation dataset
-TEST_SIZE = 5000 #size of the test dataset
+TRAINING_SIZE = 2000000 #size of the training dataset
+VALIDATION_SIZE = 200000 #size of the validation dataset
+TEST_SIZE = 10000 #size of the test dataset
 
 #Define the detector
 LOW_FREQ = 12 #frequency cut-off for the GW detector
@@ -52,8 +52,8 @@ MAX_SPIN = 0.99
 
 #Define the functions
 def dataset_generation(size_of_dataset, output_of_dataset):
-    mass = np.random.uniform(MIN_MASS, MAX_MASS, size=(size_of_dataset, 2))
-    reference_mass = np.random.uniform(MIN_MASS, MAX_MASS, size=(size_of_dataset, 2))
+    mass = np.random.exponential(20.0, size=(size_of_dataset, 2)) + MIN_MASS
+    reference_mass = np.random.exponential(20.0, size=(size_of_dataset, 2)) + MIN_MASS
     spin = np.random.uniform(MIN_SPIN, MAX_SPIN, size=(size_of_dataset, 2))
     reference_spin = np.random.uniform(MIN_SPIN, MAX_SPIN, size=(size_of_dataset, 2))
 
@@ -82,5 +82,5 @@ logger.info("Creating the training dataset")
 dataset_generation(TRAINING_SIZE, TRAINING_DATASET_FILE)
 logger.info("Creating the validation dataset")
 dataset_generation(VALIDATION_SIZE, VALIDATION_DATASET_FILE)
-logger.info("Creating the test dataset")
-dataset_generation(TEST_SIZE, TEST_DATASET_FILE)
+#logger.info("Creating the test dataset")
+#dataset_generation(TEST_SIZE, TEST_DATASET_FILE)
