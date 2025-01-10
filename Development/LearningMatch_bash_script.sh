@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:1g.5gb:1
+#SBATCH --gres=gpu:3g.20gb:1
 #SBATCH --job-name=MassSpinNN
 #SBATCH --ntasks=16
 #SBATCH --time=72:00:00
@@ -15,11 +15,10 @@ module purge
 module load system
 module load anaconda3/2022.10
 
-source activate /users/sgreen/.conda/envs/PyCBCandPytorch2
+source activate /mnt/lustre/shared_conda/envs/sgreen/PyCBCandPytorch2
 
 echo `conda info`
 echo `which python`
 
-cd /users/sgreen/Lear
-ningMatch/Development
-python NewMassMatchNN.py
+cd /users/sgreen/LearningMatch/Development
+python NEWMassSpinMatchNN.py

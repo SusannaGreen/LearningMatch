@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=6
 #SBATCH --job-name=pycbc
-#SBATCH -p sciama2.q
+#SBATCH -p sciama3.q
 #SBATCH --ntasks=16
 #SBATCH --time=72:00:00
 #SBATCH --output=output_logfile%j
