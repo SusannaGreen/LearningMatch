@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2024 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
+# Copyright (C) 2025 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
 
 from Model import NeuralNetwork
 from Dataset import FastBatchSampler, FastRandomSampler, MyDataset
@@ -28,7 +28,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler) # add file handler to logger
 
 #Define directory of the input and output files 
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/EqualAlignedSpinTrainingDataset25000004EmbeddingLayers5CrunchLayers/'
+DATA_DIR = ''
 
 #Define location to the training and validation dataset
 TRAINING_DATASET_FILE_PATH = DATA_DIR+r'1000000LambdaEtaAlignedSpinTrainingDataset+1500000DiffusedLambdaEtaAlignedSpinTrainingDataset.csv'

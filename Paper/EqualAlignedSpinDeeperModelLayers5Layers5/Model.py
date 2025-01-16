@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2024 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
+# Copyright (C) 2025 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
 
 import torch
 import torch.nn as nn
