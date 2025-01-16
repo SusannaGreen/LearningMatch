@@ -1,0 +1,9 @@
+2024-12-02 11:11:24,555 : INFO : __main__ : Using cuda device
+2024-12-02 11:11:24,555 : INFO : __main__ : Reading in the test dataset
+2024-12-02 11:11:25,103 : INFO : __main__ : The size of the test dataset is 250000
+2024-12-02 11:11:25,103 : INFO : __main__ : Converting the test dataset into a tensor
+2024-12-02 11:11:25,340 : INFO : __main__ : Loading the LearningMatch model
+2024-12-02 11:11:27,345 : INFO : __main__ : LearningMatch is predicting the Match for your dataset
+2024-12-02 11:11:36,118 : INFO : __main__ : ('Total time taken', 8.772037029266357)
+2024-12-02 11:11:36,118 : INFO : __main__ : ('Average time taken to predict the match', 3.508814811706543e-05)
+2024-12-02 11:11:36,118 : INFO : __main__ : Creating a loss curve which compares the training loss with validation loss

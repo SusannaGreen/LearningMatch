@@ -5,11 +5,8 @@ Development/runs/Mar17_15-59-35_gpu02.pri.sciama3.alces.network/events.out.tfeve
 Development/runs/Mar17_15-59-35_gpu02.pri.sciama3.alces.network/events.out.tfevents.1679068775.gpu02.pri.sciama3.alces.network.71392.0
 Development/runs/Mar17_15-59-44_gpu02.pri.sciama3.alces.network/events.out.tfevents.1679068785.gpu02.pri.sciama3.alces.network.71637.0
 Development/runs/Mar17_16-04-16_gpu02.pri.sciama3.alces.network/events.out.tfevents.1679069056.gpu02.pri.sciama3.alces.network.72008.0
-**.log
-**.png
-**.csv
-**.pth
 **.bin
+**.csv
 **.pyc
 error_logfile**
 output_logfile**

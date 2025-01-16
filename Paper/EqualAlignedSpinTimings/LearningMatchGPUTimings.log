@@ -1,0 +1,75 @@
+2024-12-03 09:41:02,013 : INFO : __main__ : Using cuda device
+2024-12-03 09:41:02,014 : INFO : __main__ : Reading in the test dataset
+2024-12-03 09:41:02,294 : INFO : __main__ : The size of the test dataset is 250000
+2024-12-03 09:41:02,294 : INFO : __main__ : Converting the test dataset into a tensor
+2024-12-03 09:41:02,521 : INFO : __main__ : Loading the LearningMatch model
+2024-12-03 09:41:03,854 : INFO : __main__ : The size of batch is 32
+2024-12-03 09:41:09,563 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc4635e7fd0>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  722.70 us
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:09,563 : INFO : __main__ : The total time is of batch 2.2584332211408765e-05
+2024-12-03 09:41:09,563 : INFO : __main__ : The size of batch is 64
+2024-12-03 09:41:14,694 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc46889dc90>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  749.18 us
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:14,694 : INFO : __main__ : The total time is of batch 1.1706005578162148e-05
+2024-12-03 09:41:14,694 : INFO : __main__ : The size of batch is 128
+2024-12-03 09:41:15,590 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc463760d10>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  854.90 us
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:15,591 : INFO : __main__ : The total time is of batch 6.678941470454447e-06
+2024-12-03 09:41:15,591 : INFO : __main__ : The size of batch is 256
+2024-12-03 09:41:17,144 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc440752f50>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  1.50 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:17,145 : INFO : __main__ : The total time is of batch 5.869051718036644e-06
+2024-12-03 09:41:17,145 : INFO : __main__ : The size of batch is 512
+2024-12-03 09:41:19,915 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc4635e7fd0>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  2.71 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:19,915 : INFO : __main__ : The total time is of batch 5.2858448361803315e-06
+2024-12-03 09:41:19,915 : INFO : __main__ : The size of batch is 1024
+2024-12-03 09:41:25,246 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc46889dc90>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  5.24 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:25,246 : INFO : __main__ : The total time is of batch 5.118836246765568e-06
+2024-12-03 09:41:25,246 : INFO : __main__ : The size of batch is 2048
+2024-12-03 09:41:35,992 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc440752bd0>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  10.61 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:35,993 : INFO : __main__ : The total time is of batch 5.183099189707718e-06
+2024-12-03 09:41:35,993 : INFO : __main__ : The size of batch is 4096
+2024-12-03 09:41:56,634 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc463760d10>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  20.40 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:41:56,634 : INFO : __main__ : The total time is of batch 4.980152132247895e-06
+2024-12-03 09:41:56,634 : INFO : __main__ : The size of batch is 8192
+2024-12-03 09:42:36,050 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc4635e7fd0>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  38.99 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:42:36,051 : INFO : __main__ : The total time is of batch 4.759471394208958e-06
+2024-12-03 09:42:36,051 : INFO : __main__ : The size of batch is 16384
+2024-12-03 09:43:54,520 : INFO : __main__ : The total time is of batch <torch.utils.benchmark.utils.common.Measurement object at 0x7fc46889dc90>
+run_batch_inference(compiled_model, x)
+setup: from __main__ import run_batch_inference
+  77.66 ms
+  1 measurement, 1000 runs , 1 thread
+2024-12-03 09:43:54,521 : INFO : __main__ : The total time is of batch 4.739802164635876e-06
