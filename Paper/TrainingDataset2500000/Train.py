@@ -28,11 +28,11 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler) # add file handler to logger
 
 #Define directory of the input and output files 
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/TrainingDataset25000004EmbeddingLayers5CrunchLayers/'
+DATA_DIR = '/users/sgreen/LearningMatch/Paper/TrainingDataset2500000/'
 
 #Define location to the training and validation dataset
-TRAINING_DATASET_FILE_PATH = DATA_DIR+r'1000000LambdaEtaAlignedSpinTrainingDataset+1500000DiffusedLambdaEtaAlignedSpinTrainingDataset.csv'
-VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'100000LambdaEtaAlignedSpinValidationDataset+150000DiffusedLambdaEtaAlignedSpinValidationDataset.csv'
+TRAINING_DATASET_FILE_PATH = DATA_DIR+r'DatasetGeneration/1000000LambdaEtaAlignedSpinTrainingDataset+1500000DiffusedLambdaEtaAlignedSpinTrainingDataset.csv'
+VALIDATION_DATASET_FILE_PATH = DATA_DIR+r'DatasetGeneration/100000LambdaEtaAlignedSpinValidationDataset+150000DiffusedLambdaEtaAlignedSpinValidationDataset.csv'
 
 #Define output location of the LearningMatch model
 LEARNINGMATCH_MODEL = DATA_DIR+'LearningMatchModel.pth'

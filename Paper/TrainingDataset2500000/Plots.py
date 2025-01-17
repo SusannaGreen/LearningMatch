@@ -35,21 +35,21 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler) # add file handler to logger
 
 #Define directory of the input and output files 
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/TrainingDataset25000004EmbeddingLayers5CrunchLayers/'
+DATA_DIR = '/users/sgreen/LearningMatch/Paper/TrainingDataset2500000/'
 
 #Define location of the test dataset
-TEST_DATASET_FILE_PATH = '/users/sgreen/LearningMatch/Paper/TrainingDataset25000004EmbeddingLayers5CrunchLayers/100000LambdaEtaAlignedSpinTestDataset+150000DiffusedLambdaEtaAlignedSpinTestDataset.csv'
+TEST_DATASET_FILE_PATH = '/users/sgreen/LearningMatch/Paper/DatasetGeneration/100000LambdaEtaAlignedSpinTestDataset+150000DiffusedLambdaEtaAlignedSpinTestDataset.csv'
 
 #Define location of the trained LearningMatch model 
-LEARNINGMATCH_MODEL =  DATA_DIR+'LearningMatchModel.pth'
+LEARNINGMATCH_MODEL =  DATA_DIR+ r'LearningMatchModel.pth'
 
 #Define location of the loss File
 LOSS_FILE = DATA_DIR+ r'TrainingValidationLoss.csv'
 
 #Defining the location of the outputs
-LOSS_CURVE = DATA_DIR+'LossCurve.png'
-ERROR_HISTOGRAM = DATA_DIR+'Error.png'
-ACTUAL_PREDICTED_PLOT = DATA_DIR+'ActualPredicted.png'
+LOSS_CURVE = DATA_DIR+ r'LossCurve.png'
+ERROR_HISTOGRAM = DATA_DIR+ r'Error.png'
+ACTUAL_PREDICTED_PLOT = DATA_DIR+ r'ActualPredicted.png'
         
 #Define the functions
 def to_cpu_np(x):
