@@ -19,5 +19,5 @@ source activate /mnt/lustre2/shared_conda/envs/sgreen/PyCBCandOptuna_2
 echo `conda info`
 echo `which python`
 
-cd /users/sgreen/LearningMatch/Paper/
+cd /users/sgreen/LearningMatch/Paper/DatasetGeneration/
 python DatasetsLambdaEtaAlignedSpinNormal.py

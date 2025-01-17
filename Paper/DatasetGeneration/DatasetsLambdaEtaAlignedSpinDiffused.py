@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2025 Susanna M. Green, Andrew P. Lundgren, and Xan Morice-Atkinson 
+
 import numpy as np
 from numpy.random import default_rng
 import pandas as pd
@@ -13,7 +17,7 @@ from joblib import Parallel, delayed
 import joblib
 
 #Define directory for the output
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/'
+DATA_DIR = '/users/sgreen/LearningMatch/Paper/DatasetGeneration/'
 
 #Define the dataset training, validation and test dataset
 DATASET_FILE = DATA_DIR+'15000DiffusedLambdaEtaAlignedSpinTrainingDataset.csv'
