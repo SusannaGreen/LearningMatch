@@ -17,7 +17,7 @@ from joblib import Parallel, delayed
 import joblib
 
 #Define directory for the output
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/DatasetGeneration/'
+DATA_DIR = ''
 
 #Define the dataset training, validation and test dataset
 DATASET_FILE = DATA_DIR+'15000DiffusedLambdaEtaAlignedSpinTrainingDataset.csv'

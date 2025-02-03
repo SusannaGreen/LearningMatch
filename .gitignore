@@ -8,6 +8,7 @@ Development/runs/Mar17_16-04-16_gpu02.pri.sciama3.alces.network/events.out.tfeve
 **.bin
 **.pyc
 **.sh
+**.csv
 error_logfile**
 output_logfile**
 Development/**

@@ -32,7 +32,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler) # add file handler to logger
 
 #Define directory of the input and output files 
-DATA_DIR = '/users/sgreen/LearningMatch/Paper/Timings/'
+DATA_DIR = ''
 
 #Define location of the test dataset
 TEST_DATASET_FILE_PATH = DATA_DIR + r'DatasetGeneration/100000LambdaEtaAlignedSpinTestDataset+150000DiffusedLambdaEtaAlignedSpinTestDataset.csv'
