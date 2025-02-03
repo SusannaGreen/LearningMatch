@@ -1,5 +1,5 @@
 # LearningMatch
-A Siamese neural network that has learned the match manifold, see paper for more infomation. 
+A Siamese neural network that has learned the match manifold, see paper for more infomation. The datasets used to train LearningMatch can be accessed on Zenodo (10.5281/zenodo.14773846).
 
 In order to use LearningMatch please make sure you install the following key packages NumPy, Joblib, Typing, Pandas, PyTorch, and PyCBC. See the `requirements.txt` for more information on versions. 
 
